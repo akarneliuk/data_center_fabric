@@ -1,0 +1,16 @@
+---
+ansible_user: aaa
+ansible_pass: N3tw0rk!
+ansible_ssh_pass: N3tw0rk!
+ansible_become_pass: N3tw0rk!
+
+# Integration with NetBox
+netbox_token: 0123456789abcdef0123456789abcdef01234567
+
+# Day zero credentials Cumulus Linux
+cumulus_user: cumulus
+cumulus_pass: CumulusLinux!
+
+# Some fabric parameters:
+cumulus_bgp_fabric: DC_F@BR!C$
+...

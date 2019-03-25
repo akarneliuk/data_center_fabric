@@ -1,0 +1,37 @@
+---
+- name: CREATING TEMPORARY FOLDER
+  file:
+      dest: "{{ working_folder }}"
+      state: directory
+
+- name: GETTING INFO ABOUT NETBOX CONTAINER
+  shell: "sudo docker container port {{ netbox_frontend_container }}"
+  become: yes
+  register: netbox_frontend_container_port
+
+- name: SETTING API PORT
+  set_fact:
+      netbox_port: "{{ netbox_frontend_container_port.stdout | regex_replace('^.*:(\\d+)$', '\\1') }}"
+
+- name: GETTING LIST OF DEVICES
+  uri:
+      url: "http://{{ netbox_host }}:{{ netbox_port }}/api/dcim/devices/"
+      method: GET
+      return_content: yes
+      headers:
+          accept: "application/json"
+          Authorization: "Token {{ netbox_token }}"
+  register: get_devices
+
+# Commented as should be used only for debug purposes
+#- name: READING LIST OF DEVICES
+#  debug:
+#      msg: "{{ get_devices.json }}"
+
+- name: STARTING CONFIGURATION LOOP
+  include_tasks: configuration_loop.yml
+  loop: "{{ get_devices.json.results }}"
+  loop_control:
+      loop_var: device_item
+...
+

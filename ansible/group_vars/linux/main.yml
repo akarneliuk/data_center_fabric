@@ -1,0 +1,8 @@
+---
+# General vars
+working_folder: /tmp/network_fabric
+
+# Netbox integration
+netbox_host: localhost
+netbox_frontend_container: netboxdocker_nginx_1
+...

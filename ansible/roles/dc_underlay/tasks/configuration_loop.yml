@@ -1,0 +1,52 @@
+---
+- name: CONFIGURATION LOOP // GETING PORTS CONFIG
+  uri:
+      url: "http://{{ netbox_host }}:{{ netbox_port }}/api/dcim/interfaces/?device={{ device_item.name }}"
+      method: GET
+      return_content: yes
+      headers:
+          accept: "application/json"
+          Authorization: "Token {{ netbox_token }}"
+  register: get_device_ports
+
+# Commented as should be used only for debug purposes
+#- name: CONFIGURATION LOOP // READING PORT DATA
+#  debug:
+#      msg: "{{ get_device_ports.json }}"
+
+- name: CONFIGURATION LOOP // GETING IP CONFIG
+  uri:
+      url: "http://{{ netbox_host }}:{{ netbox_port }}/api/ipam/ip-addresses/?device={{ device_item.name }}"
+      method: GET
+      return_content: yes
+      headers:
+          accept: "application/json"
+          Authorization: "Token {{ netbox_token }}"
+  register: get_device_ip
+
+# Commented as should be used only for debug purposes
+#- name: CONFIGURATION LOOP // READING IP DATA
+#  debug:
+#      msg: "{{ get_device_ip.json }}"
+
+- name: CONFIGURATION LOOP // CREATING TEMPORARY FOLDER FOR {{ device_item.name }}
+  file:
+      dest: "{{ working_folder }}/{{ device_item.name }}"
+      state: directory
+
+- name: CONFIGURATION LOOP // TEMPLATING CONFIG FOR {{ device_item.name }}
+  template:
+      src: "{{ device_item.platform.slug }}.j2"
+      dest: "{{ working_folder }}/{{ device_item.name }}/{{ device_item.name }}.conf"
+
+- name: CONFIGURATION LOOP // CONFIGURING {{ device_item.name }}
+  nclu:
+      atomic: yes
+      template: "{{ lookup('template', '{{ device_item.platform.slug }}.j2') }}"
+  ignore_errors: yes
+  ignore_unreachable: yes
+  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
+  vars:
+      ansible_user: "{{ cumulus_user }}"
+      ansible_ssh_pass: "{{ cumulus_pass }}"
+...

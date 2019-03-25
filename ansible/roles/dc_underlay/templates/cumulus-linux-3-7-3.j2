@@ -1,0 +1,91 @@
+{# 1. hostname #}
+add hostname {{ device_item.name }}
+
+{# 2. add BGP process #}
+add bgp autonomous-system {{ device_item.local_context_data.bgp_asn }}
+add bgp bestpath as-path multipath-relax
+add bgp l2vpn evpn advertise-all-vni
+add bgp neighbor BGP_FABRIC peer-group
+add bgp neighbor BGP_FABRIC remote-as external
+add bgp neighbor BGP_FABRIC password {{ cumulus_bgp_fabric }}
+add bgp neighbor BGP_FABRIC capability extended-nexthop
+add bgp neighbor BGP_FABRIC bfd 3 333 333
+add bgp l2vpn evpn neighbor BGP_FABRIC activate
+add bgp ipv6 unicast neighbor BGP_FABRIC activate
+
+{# 3. VRF and IP #}
+{% for iface in get_device_ip.json.results %}{# f-001: looping all interaces #}
+{# creation of VRFs #}
+{% if iface.vrf != None %}{# i-001: excluding GRT #}
+add vrf {{ iface.vrf.name }}
+add interface {{ iface.interface.name }} vrf {{ iface.vrf.name }}
+{% endif %}{# i-001: excluding GRT #}
+
+{# configuration of IP adresses #}
+{% if iface.interface.name == 'lo' %}{# i-007: checking lo or phy #}
+{% if iface.role.label is defined and iface.role.label == 'Loopback' %}{# i-008: checking Anycast #}
+add loopback {{ iface.interface.name }} {% if iface.family == 4 %}ip{% elif iface.family == 6 %}ipv6{% endif %} address {{ iface.address }}
+
+{% elif iface.role.label is defined and iface.role.label == 'Anycast' %}{# i-008: checking Anycast #}
+add loopback {{ iface.interface.name }} clag vxlan-anycast-ip {{ iface.address | ipaddr('address') }}
+
+{% endif %}{# i-008: checking Anycast #}
+{% else %}{# i-007: checking lo or phy #}
+add interface {{ iface.interface.name }} {% if iface.family == 4 %}ip{% elif iface.family == 6 %}ipv6{% endif %} address {{ iface.address }}
+
+{% endif %}{# i-007: checking lo or phy #}
+
+{% if iface.interface.name == 'lo' %}{# i-005: adding BGP RID #}
+{% if iface.role.label != 'Anycast' and iface.family == 4 %}{# i-009 #}
+add bgp router-id {{ iface.address | ipaddr('address') }}
+
+{% endif %}{# i-009 #}
+add bgp ipv{{ iface.family }} unicast network {{ iface.address }}
+
+{% endif %}{# i-005: adding BGP RID #}
+
+{% endfor %}{# f-001: looping all interaces #}
+
+
+{# 4. physical ports #}
+{% for physical_port in get_device_ports.json.results %}{# f-002: looping all physical ports #}
+{% if physical_port.mtu != None %}{# i-002: setting MTU #}
+add interface {{ physical_port.name }} mtu {{ physical_port.mtu }}
+{% endif %}{# i-002: setting MTU #}
+
+{% if physical_port.lag != None %}{# i-003: configuring LAGs #}
+{% if physical_port.lag.name == 'peerlink' %}{# i-004: creating CLAG #}
+add clag peer sys-mac 44:38:39:FF:00:01 interface {{ physical_port.name }} {% if device_item.name.split('-') | last == '1' %}primary{% else %}secondary{% endif %} backup {% for peer_device in get_devices.json.results %}{% if peer_device.name == physical_port.connected_endpoint.device.name %}{{ peer_device.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %} vrf mgmt
+{% endif %}{# i-004: creating CLAG #}
+{% endif %}{# i-003: configuring LAGs #}
+
+{% if physical_port.connected_endpoint != None %}{# i-006: creating BGP neighbors #}
+{% if 'leaf' in device_item.name and 'spine' in physical_port.connected_endpoint.device.name %}
+add interface {{ physical_port.name }} ipv6 nd ra-interval 10
+del interface {{ physical_port.name }} ipv6 nd suppress-ra
+add bgp neighbor {{ physical_port.name }} interface v6only
+add bgp neighbor {{ physical_port.name }} peer-group BGP_FABRIC
+{% elif 'leaf' in device_item.name and 'spine' in physical_port.connected_endpoint.device.name %}
+add interface {{ physical_port.name }} ipv6 nd ra-interval 10
+del interface {{ physical_port.name }} ipv6 nd suppress-ra
+add bgp neighbor {{ physical_port.name }} interface v6only 
+add bgp neighbor {{ physical_port.name }} peer-group BGP_FABRIC
+{% elif 'border' in device_item.name and 'spine' in physical_port.connected_endpoint.device.name %}
+add interface {{ physical_port.name }} ipv6 nd ra-interval 10
+del interface {{ physical_port.name }} ipv6 nd suppress-ra
+add bgp neighbor {{ physical_port.name }} interface v6only 
+add bgp neighbor {{ physical_port.name }} peer-group BGP_FABRIC
+{% elif 'spine' in device_item.name and 'leaf' in physical_port.connected_endpoint.device.name %}
+add interface {{ physical_port.name }} ipv6 nd ra-interval 10
+del interface {{ physical_port.name }} ipv6 nd suppress-ra
+add bgp neighbor {{ physical_port.name }} interface v6only 
+add bgp neighbor {{ physical_port.name }} peer-group BGP_FABRIC
+{% elif 'spine' in device_item.name and 'border' in physical_port.connected_endpoint.device.name %}
+add interface {{ physical_port.name }} ipv6 nd ra-interval 10
+del interface {{ physical_port.name }} ipv6 nd suppress-ra
+add bgp neighbor {{ physical_port.name }} interface v6only 
+add bgp neighbor {{ physical_port.name }} peer-group BGP_FABRIC
+{% endif %}
+{% endif %}{# i-006: creating BGP neighbors #}
+
+{% endfor %}{# f-002: looping all physical ports #}
