@@ -10,7 +10,7 @@ This project is a sister of another my project `Service Provider Fabric`. At som
 
 # Version
 
-The current version of this repository is `0.1`.
+The current version of this repository is `0.1.1`.
 
 # Prerequisites
 
@@ -22,3 +22,6 @@ Version `0.1`.
 1. Initial release
 2. Integration of Ansible with NetBox over REST API to retreive information needed to create configuration for Cumulus Linux.
 3. Automatic provisioning of Cumulus VX using information extracted in previous point.
+
+Version `0.1.1`.
+1. Topology is added within `topology` folder.
