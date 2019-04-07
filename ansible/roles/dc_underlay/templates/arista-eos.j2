@@ -1,0 +1,84 @@
+configure terminal
+!
+ipv4 routing
+!
+ipv6 unicast-routing
+!
+! 1. hostname
+!
+hostname {{ device_item.name }}
+!
+{% if 'leaf' in device_item.name %}{# i-004: preparing stanadrd config for mlag #}
+! 2. starting M-LAG peering
+!
+vlan 4094 
+    trunk group mlag_peer
+!
+{% endif %}{# i-004: preparing stanadrd config for mlag #}
+! 3. interfaces
+!
+{% for device_all_interfaces in get_all_interfaces.results %}{# f-001: list all interfaces from all devices #}
+{% for device_interface in device_all_interfaces.json.results %}{# f-002: list all interfaces per device #}
+{% if device_interface.device.name == device_item.name %}{# i-001: matching only proper interfaces #}
+interface {{ device_interface.name }}
+{% for device_all_ips in get_all_ip.results %}{# f-003: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-004: list all IP per device #}
+{% if device_ip.interface.device.name == device_item.name and device_ip.interface.name == device_interface.name %}{# i-002: matching only proper IP #}
+    no switchport
+{% if device_ip.family.value == 4 %}{# i-003: defining address-family for IP #}
+    ip address {{ device_ip.address }} {% if device_ip.role != None and device_ip.role.label == 'Anycast' %}secondary{% endif %}
+
+{% elif device_ip.family.value == 6 %}{# i-003: defining address-family for IP #}
+    ipv6 address {{ device_ip.address }}
+{% endif %}{# i-003: defining address-family for IP #}
+{% endif %}{# i-002: matching only proper IP #}
+{% endfor %}{# f-004: list all IP per device #}
+{% endfor %}{# f-003: list all IP from all devices #}
+{% if device_interface.connected_endpoint != None and 'leaf' in device_interface.connected_endpoint.device.name and not 'LAG' in device_interface.form_factor.label %}{# i-006: matching peering leaf #}
+    channel-group {{ device_interface.lag.name.split(' ') | last }} mode active
+{% endif %}{# i-006: matching peering leaf #}
+{% if 'LAG' in device_interface.form_factor.label %}{# i-007: peerlink #}
+{% if device_interface.mode.label == 'Tagged'%}{# i-008: configuring trunk #}
+    switchport mode trunk
+{% endif %}{# i-008: configuring trunk #}
+{% if 'leaf' in device_item.name %}
+    switchport trunk group mlag_peer
+{% endif %}
+{% endif %}{# i-007: peerlink #}
+    no shutdown
+!
+{% endif %}{# i-001: matching only proper interfaces #}
+{% endfor %}{# f-002: list all interfaces per device #}
+{% endfor %}{# f-001: list all interfaces from all devices #}
+!
+{% if 'leaf' in device_item.name %}{# i-005: preparing stanadrd config for mlag #}
+! 4. finalizing M-LAG peering
+!
+interface 4094
+    ip address 169.254.1.{% if device_item.local_context_data.primary %}1{% else %}2{% endif %}/30
+    no autostate
+!
+no spanning-tree vlan-id 4094
+!
+mlag configuration
+    local-interface vlan 4094
+    peer-address 169.254.1.{% if device_item.local_context_data.primary %}2{% else %}1{% endif %}
+
+    peer-link port-channel 1
+    domain-id {{ device_item.name.split('-')[0] }}-{{ device_item.name.split('-')[1] }}-{{ device_item.name.split('-')[2] }}
+    heartbeat-interval 2500
+    reload-delay 150
+    no shutdown
+!
+{% endif %}{# i-005: preparing stanadrd config for mlag #}
+! 5. BGP
+router bgp {{ device_item.local_context_data.bgp_asn }}
+{% for device_all_ips in get_all_ip.results %}{# f-005: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-006: list all IP per device #}
+{% if device_ip.interface.device.name == device_item.name and device_ip.interface.name == 'Loopback 0' and device_ip.role.label == 'Loopback' and device_ip.family.value == 4 %}{# i-009: matching only proper IP #}
+    router-id {{ device_ip.address.split('/') | first }}
+{% endif %}{# i-009: matching only proper IP #}
+{% endfor %}{# f-006: list all IP per device #}
+{% endfor %}{# f-005: list all IP from all devices #}
+!
+end

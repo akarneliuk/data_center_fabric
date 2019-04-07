@@ -23,6 +23,17 @@
           Authorization: "Token {{ netbox_token }}"
   register: get_devices
 
+- name: GETTING LIST OF ALL INTERFACES
+  uri:
+      url: "http://{{ netbox_host }}:{{ netbox_port }}/api/dcim/interfaces/?device={{ item.name }}"
+      method: GET
+      return_content: yes
+      headers:
+          accept: "application/json"
+          Authorization: "Token {{ netbox_token }}"
+  register: get_all_interfaces
+  loop: "{{ get_devices.json.results }}"
+
 - name: GETTING LIST OF ALL IP ADDRESSES
   uri:
       url: "http://{{ netbox_host }}:{{ netbox_port }}/api/ipam/ip-addresses/?device={{ item.name }}"
