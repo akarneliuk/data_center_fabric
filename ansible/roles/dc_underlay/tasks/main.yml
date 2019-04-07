@@ -23,10 +23,22 @@
           Authorization: "Token {{ netbox_token }}"
   register: get_devices
 
+- name: GETTING LIST OF ALL IP ADDRESSES
+  uri:
+      url: "http://{{ netbox_host }}:{{ netbox_port }}/api/ipam/ip-addresses/?device={{ item.name }}"
+      method: GET
+      return_content: yes
+      headers:
+          accept: "application/json"
+          Authorization: "Token {{ netbox_token }}"
+  register: get_all_ip
+  loop: "{{ get_devices.json.results }}"
+
 # Commented as should be used only for debug purposes
-#- name: READING LIST OF DEVICES
+#- name: READING LIST OF ALL IP ADDRESSES
 #  debug:
-#      msg: "{{ get_devices.json }}"
+#      msg: "{{ item.json.results }}"
+#  loop: "{{ get_all_ip.results }}"
 
 - name: STARTING CONFIGURATION LOOP
   include_tasks: configuration_loop.yml

@@ -47,6 +47,7 @@
   ignore_unreachable: yes
   delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
   vars:
-      ansible_user: "{{ cumulus_user }}"
-      ansible_ssh_pass: "{{ cumulus_pass }}"
+      ansible_user: "{{ cumulus.user }}"
+      ansible_ssh_pass: "{{ cumulus.pass }}"
+  when: device_item.platform.slug == 'cumulus-linux'
 ...

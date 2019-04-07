@@ -8,9 +8,23 @@ ansible_become_pass: N3tw0rk!
 netbox_token: 0123456789abcdef0123456789abcdef01234567
 
 # Day zero credentials Cumulus Linux
-cumulus_user: cumulus
-cumulus_pass: CumulusLinux!
+cumulus:
+    user: cumulus
+    pass: CumulusLinux!
+
+# Day zero credentials Cisco IOS XR
+cisco:
+    user: cisco
+    pass: cisco
+
+# Day zero credentials Cumulus Linux
+arista:
+    user: aaa
+    pass: aaa
 
 # Some fabric parameters:
-cumulus_bgp_fabric: DC_F@BR!C$
+bgp:
+    password: DC_F@BR!C$
+    send: 10
+    receive: 30
 ...
