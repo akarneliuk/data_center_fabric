@@ -10,7 +10,7 @@ This project is a sister of another my project `Service Provider Fabric`. At som
 
 # Version
 
-The current version of this repository is `0.1.1`.
+The current version of this repository is `0.2`.
 
 # Prerequisites
 
@@ -25,3 +25,7 @@ Version `0.1`.
 
 Version `0.1.1`.
 1. Topology is added within `topology` folder.
+
+Version `0.2`.
+1. Automatic provisioning of Arista EOS for underlay IP Fabric.
+2. Automatic provisioning of Cisco IOS XR for underlay IP Fabric.

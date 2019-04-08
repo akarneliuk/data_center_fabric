@@ -1,8 +1,9 @@
 configure terminal
 !
-ipv4 routing
-!
+ip routing
 ipv6 unicast-routing
+service routing protocols model multi-agent
+logging console debug
 !
 ! 1. hostname
 !
@@ -24,7 +25,9 @@ interface {{ device_interface.name }}
 {% for device_all_ips in get_all_ip.results %}{# f-003: list all IP from all devices #}
 {% for device_ip in device_all_ips.json.results %}{# f-004: list all IP per device #}
 {% if device_ip.interface.device.name == device_item.name and device_ip.interface.name == device_interface.name %}{# i-002: matching only proper IP #}
+{% if 'Ethernet' in device_interface.name %}{# i-010: checking Loopback #}
     no switchport
+{% endif %}{# i-010: checking Loopback #}
 {% if device_ip.family.value == 4 %}{# i-003: defining address-family for IP #}
     ip address {{ device_ip.address }} {% if device_ip.role != None and device_ip.role.label == 'Anycast' %}secondary{% endif %}
 
@@ -54,11 +57,11 @@ interface {{ device_interface.name }}
 {% if 'leaf' in device_item.name %}{# i-005: preparing stanadrd config for mlag #}
 ! 4. finalizing M-LAG peering
 !
-interface 4094
+interface Vlan 4094
     ip address 169.254.1.{% if device_item.local_context_data.primary %}1{% else %}2{% endif %}/30
     no autostate
 !
-no spanning-tree vlan-id 4094
+no spanning-tree vlan 4094
 !
 mlag configuration
     local-interface vlan 4094
@@ -72,13 +75,98 @@ mlag configuration
 !
 {% endif %}{# i-005: preparing stanadrd config for mlag #}
 ! 5. BGP
+!
 router bgp {{ device_item.local_context_data.bgp_asn }}
+    neighbor IPV4_BGP_FABRIC peer-group
+    neighbor IPV4_BGP_FABRIC update-source Loopback0
+    neighbor IPV4_BGP_FABRIC timers {{ bgp.send }} {{ bgp.receive }} 
+    neighbor IPV4_BGP_FABRIC password {{ bgp.password }}
+    !
+    neighbor IPV6_BGP_FABRIC peer-group
+    neighbor IPV6_BGP_FABRIC update-source Loopback0
+    neighbor IPV6_BGP_FABRIC timers {{ bgp.send }} {{ bgp.receive }}
+    neighbor IPV6_BGP_FABRIC password {{ bgp.password }}
+    !
 {% for device_all_ips in get_all_ip.results %}{# f-005: list all IP from all devices #}
 {% for device_ip in device_all_ips.json.results %}{# f-006: list all IP per device #}
 {% if device_ip.interface.device.name == device_item.name and device_ip.interface.name == 'Loopback 0' and device_ip.role.label == 'Loopback' and device_ip.family.value == 4 %}{# i-009: matching only proper IP #}
     router-id {{ device_ip.address.split('/') | first }}
 {% endif %}{# i-009: matching only proper IP #}
+{% if device_ip.interface.device.name == device_item.name and device_ip.interface.name == 'Loopback 0' %}{# i-010: announcing IP addresses #}
+    address-family ipv{{ device_ip.family.value }}
+        network {{ device_ip.address }}
+    !
+{% endif %}{# i-010: announcing IP addresses #}
 {% endfor %}{# f-006: list all IP per device #}
 {% endfor %}{# f-005: list all IP from all devices #}
+    !
+{% for device_all_interfaces in get_all_interfaces.results %}{# f-007: list all interfaces from all devices #}
+{% for device_interface in device_all_interfaces.json.results %}{# f-008: list all interfaces per device #}
+{% if device_interface.device.name == device_item.name and device_interface.connected_endpoint != None %}{# i-011: matching only proper interfaces #}
+{% if 'leaf' in device_interface.device.name and 'spine' in device_interface.connected_endpoint.device.name %}{# i-012: looking for neighbors #}
+{% for device_all_ips in get_all_ip.results %}{# f-009: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-010: list all IP per device #}
+{% if device_interface.connected_endpoint.device.name == device_ip.interface.device.name and device_interface.connected_endpoint.name == device_ip.interface.name %}{# i-012: matchin peer IP addresses #}
+    neighbor {{ device_ip.address.split('/') | first }} remote-as {% for peer_device in get_devices.json.results %}{% if peer_device.name == device_ip.interface.device.name %}{{ peer_device.local_context_data.bgp_asn }}{% endif %}{% endfor %}
+
+    neighbor {{ device_ip.address.split('/') | first }} peer-group IPV{{ device_ip.family.value }}_BGP_FABRIC
+    !
+{% endif %}{# i-012: matchin peer IP addresses #}
+{% endfor %}{# f-010: list all IP per device #}
+{% endfor %}{# f-009: list all IP from all devices #}
+    !
+{% elif 'border' in device_interface.device.name and 'spine' in device_interface.connected_endpoint.device.name %}{# i-012: looking for neighbors #}
+{% for device_all_ips in get_all_ip.results %}{# f-009: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-010: list all IP per device #}
+{% if device_interface.connected_endpoint.device.name == device_ip.interface.device.name and device_interface.connected_endpoint.name == device_ip.interface.name %}{# i-012: matchin peer IP addresses #}
+    neighbor {{ device_ip.address.split('/') | first }} remote-as {% for peer_device in get_devices.json.results %}{% if peer_device.name == device_ip.interface.device.name %}{{ peer_device.local_context_data.bgp_asn }}{% endif %}{% endfor %}
+
+    neighbor {{ device_ip.address.split('/') | first }} peer-group IPV{{ device_ip.family.value }}_BGP_FABRIC
+    !
+{% endif %}{# i-012: matchin peer IP addresses #}
+{% endfor %}{# f-010: list all IP per device #}
+{% endfor %}{# f-009: list all IP from all devices #}
+    !
+{% elif 'spine' in device_interface.device.name and 'leaf' in device_interface.connected_endpoint.device.name %}{# i-012: looking for neighbors #}
+{% for device_all_ips in get_all_ip.results %}{# f-009: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-010: list all IP per device #}
+{% if device_interface.connected_endpoint.device.name == device_ip.interface.device.name and device_interface.connected_endpoint.name == device_ip.interface.name %}{# i-012: matchin peer IP addresses #}
+    neighbor {{ device_ip.address.split('/') | first }} remote-as {% for peer_device in get_devices.json.results %}{% if peer_device.name == device_ip.interface.device.name %}{{ peer_device.local_context_data.bgp_asn }}{% endif %}{% endfor %}
+
+    neighbor {{ device_ip.address.split('/') | first }} peer-group IPV{{ device_ip.family.value }}_BGP_FABRIC
+    !
+{% endif %}{# i-012: matchin peer IP addresses #}
+{% endfor %}{# f-010: list all IP per device #}
+{% endfor %}{# f-009: list all IP from all devices #}
+    !
+{% elif 'spine' in device_interface.device.name and 'border' in device_interface.connected_endpoint.device.name %}{# i-012: looking for neighbors #}
+{% for device_all_ips in get_all_ip.results %}{# f-009: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-010: list all IP per device #}
+{% if device_interface.connected_endpoint.device.name == device_ip.interface.device.name and device_interface.connected_endpoint.name == device_ip.interface.name %}{# i-012: matchin peer IP addresses #}
+    neighbor {{ device_ip.address.split('/') | first }} remote-as {% for peer_device in get_devices.json.results %}{% if peer_device.name == device_ip.interface.device.name %}{{ peer_device.local_context_data.bgp_asn }}{% endif %}{% endfor %}
+
+    neighbor {{ device_ip.address.split('/') | first }} peer-group IPV{{ device_ip.family.value }}_BGP_FABRIC
+    !
+{% endif %}{# i-012: matchin peer IP addresses #}
+{% endfor %}{# f-010: list all IP per device #}
+{% endfor %}{# f-009: list all IP from all devices #}
+    !
+{% endif %}{# i-012: looking for neighbors #}
+{% endif %}{# i-011: matching only proper interfaces #}
+{% endfor %}{# f-008: list all interfaces per device #}
+{% endfor %}{# f-007: list all interfaces from all devices #}
+    !
+    address-family evpn
+        neighbor IPV4_BGP_FABRIC activate
+        no neighbor IPV6_BGP_FABRIC activate
+    !
+     address-family ipv4
+        neighbor IPV4_BGP_FABRIC activate
+        no neighbor IPV6_BGP_FABRIC activate
+    !
+    address-family ipv6
+        no neighbor IPV4_BGP_FABRIC activate
+        neighbor IPV6_BGP_FABRIC activate
+    !
 !
 end

@@ -50,4 +50,18 @@
       ansible_user: "{{ cumulus.user }}"
       ansible_ssh_pass: "{{ cumulus.pass }}"
   when: device_item.platform.slug == 'cumulus-linux'
+
+- name: CONFIGURATION LOOP // CONFIGURING {{ device_item.name }}
+  local_action:
+      module: "eos_config"
+      authorize: true
+      save: true
+      src: "{{ working_folder }}/{{ device_item.name }}/{{ device_item.name }}.conf"
+      provider:
+          host: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
+          username: "{{ arista.user }}"
+          password: "{{ arista.pass }}"
+          auth_pass: "{{ arista.pass }}"
+  when: device_item.platform.slug == 'arista-eos'
+
 ...

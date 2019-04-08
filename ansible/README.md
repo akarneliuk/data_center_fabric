@@ -11,4 +11,4 @@ Run `ansible-playbook data_center_fabric.yml --inventory=inventory/hosts`.
 
 # Current limitation
 
-Only Cumulus Linux is currently supported.
+Currently supported Cumulus Linux, Arista EOS and Cisco IOS XR.
