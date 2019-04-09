@@ -1,0 +1,156 @@
+!
+logging console debug
+logging buffer debug
+!
+! 1. hostname
+!
+hostname {{ device_item.name }}
+!
+! 2. interfaces
+!
+{% for device_all_interfaces in get_all_interfaces.results %}{# f-001: list all interfaces from all devices #}
+{% for device_interface in device_all_interfaces.json.results %}{# f-002: list all interfaces per device #}
+{% if device_interface.device.name == device_item.name %}{# i-001: matching only proper interfaces #}
+interface {{ device_interface.name }}
+{% for device_all_ips in get_all_ip.results %}{# f-003: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-004: list all IP per device #}
+{% if device_ip.interface.device.name == device_item.name and device_ip.interface.name == device_interface.name %}{# i-002: matching only proper IP #}
+    ipv{{ device_ip.family.value }} address {{ device_ip.address }}
+{% endif %}{# i-002: matching only proper IP #}
+{% endfor %}{# f-004: list all IP per device #}
+{% endfor %}{# f-003: list all IP from all devices #}
+    no shutdown
+!
+{% endif %}{# i-001: matching only proper interfaces #}
+{% endfor %}{# f-002: list all interfaces per device #}
+{% endfor %}{# f-001: list all interfaces from all devices #}
+!
+! 3. Route-policy
+!
+route-policy RP_PASS_ALL
+    pass
+end-policy
+!
+! 4. BGP
+!
+router bgp {{ device_item.local_context_data.bgp_asn }}
+    bgp log neighbor changes detail
+    !
+    address-family ipv4 unicast
+    !
+    address-family ipv6 unicast
+    !
+    address-family l2vpn evpn
+    !
+    af-group L2VPN_EVPN_AF address-family l2vpn evpn
+        send-community-ebgp
+        route-policy RP_PASS_ALL in
+        route-policy RP_PASS_ALL out
+        send-extended-community-ebgp
+        next-hop-unchanged
+    !
+    af-group IPV4_UNI_AF address-family ipv4 unicast
+        send-community-ebgp
+        route-policy RP_PASS_ALL in
+        route-policy RP_PASS_ALL out
+        send-extended-community-ebgp
+    !
+    af-group IPV6_UNI_AF address-family ipv6 unicast
+        send-community-ebgp
+        route-policy RP_PASS_ALL in
+        route-policy RP_PASS_ALL out
+        send-extended-community-ebgp
+    !
+    session-group BGP_PEERS
+        password {{ bgp.password }}
+        timers {{ bgp.send }} {{ bgp.receive }}
+        update-source Loopback0
+    !
+    neighbor-group IPV4_BGP_FABRIC
+        use session-group BGP_PEERS
+        address-family ipv4 unicast
+            use af-group IPV4_UNI_AF
+        !
+        address-family l2vpn evpn
+            use af-group L2VPN_EVPN_AF
+        !
+    !
+    neighbor-group IPV6_BGP_FABRIC
+        use session-group BGP_PEERS
+        address-family ipv6 unicast
+            use af-group IPV6_UNI_AF
+        !
+    !
+{% for device_all_ips in get_all_ip.results %}{# f-005: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-006: list all IP per device #}
+{% if device_ip.interface.device.name == device_item.name and 'Loopback' in device_ip.interface.name and device_ip.role.label == 'Loopback' and device_ip.family.value == 4 %}{# i-009: matching only proper IP #}
+    bgp router-id {{ device_ip.address.split('/') | first }}
+{% endif %}{# i-009: matching only proper IP #}
+{% if device_ip.interface.device.name == device_item.name and 'Loopback' in device_ip.interface.name %}{# i-010: announcing IP addresses #}
+    address-family ipv{{ device_ip.family.value }} unicast
+        network {{ device_ip.address }}
+    !
+{% endif %}{# i-010: announcing IP addresses #}
+{% endfor %}{# f-006: list all IP per device #}
+{% endfor %}{# f-005: list all IP from all devices #}
+    !
+{% for device_all_interfaces in get_all_interfaces.results %}{# f-007: list all interfaces from all devices #}
+{% for device_interface in device_all_interfaces.json.results %}{# f-008: list all interfaces per device #}
+{% if device_interface.device.name == device_item.name and device_interface.connected_endpoint != None %}{# i-011: matching only proper interfaces #}
+{% if 'leaf' in device_interface.device.name and 'spine' in device_interface.connected_endpoint.device.name %}{# i-012: looking for neighbors #}
+{% for device_all_ips in get_all_ip.results %}{# f-009: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-010: list all IP per device #}
+{% if device_interface.connected_endpoint.device.name == device_ip.interface.device.name and device_interface.connected_endpoint.name == device_ip.interface.name %}{# i-012: matchin peer IP addresses #}
+    neighbor {{ device_ip.address.split('/') | first }} 
+        remote-as {% for peer_device in get_devices.json.results %}{% if peer_device.name == device_ip.interface.device.name %}{{ peer_device.local_context_data.bgp_asn }}{% endif %}{% endfor %}
+
+        use neighbor-group IPV{{ device_ip.family.value }}_BGP_FABRIC
+    !
+{% endif %}{# i-012: matchin peer IP addresses #}
+{% endfor %}{# f-010: list all IP per device #}
+{% endfor %}{# f-009: list all IP from all devices #}
+    !
+{% elif 'border' in device_interface.device.name and 'spine' in device_interface.connected_endpoint.device.name %}{# i-012: looking for neighbors #}
+{% for device_all_ips in get_all_ip.results %}{# f-009: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-010: list all IP per device #}
+{% if device_interface.connected_endpoint.device.name == device_ip.interface.device.name and device_interface.connected_endpoint.name == device_ip.interface.name %}{# i-012: matchin peer IP addresses #}
+    neighbor {{ device_ip.address.split('/') | first }} 
+        remote-as {% for peer_device in get_devices.json.results %}{% if peer_device.name == device_ip.interface.device.name %}{{ peer_device.local_context_data.bgp_asn }}{% endif %}{% endfor %}
+
+        use neighbor-group IPV{{ device_ip.family.value }}_BGP_FABRIC
+    !
+{% endif %}{# i-012: matchin peer IP addresses #}
+{% endfor %}{# f-010: list all IP per device #}
+{% endfor %}{# f-009: list all IP from all devices #}
+    !
+{% elif 'spine' in device_interface.device.name and 'leaf' in device_interface.connected_endpoint.device.name %}{# i-012: looking for neighbors #}
+{% for device_all_ips in get_all_ip.results %}{# f-009: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-010: list all IP per device #}
+{% if device_interface.connected_endpoint.device.name == device_ip.interface.device.name and device_interface.connected_endpoint.name == device_ip.interface.name %}{# i-012: matchin peer IP addresses #}
+    neighbor {{ device_ip.address.split('/') | first }} 
+        remote-as {% for peer_device in get_devices.json.results %}{% if peer_device.name == device_ip.interface.device.name %}{{ peer_device.local_context_data.bgp_asn }}{% endif %}{% endfor %}
+
+        use neighbor-group IPV{{ device_ip.family.value }}_BGP_FABRIC
+    !
+{% endif %}{# i-012: matchin peer IP addresses #}
+{% endfor %}{# f-010: list all IP per device #}
+{% endfor %}{# f-009: list all IP from all devices #}
+    !
+{% elif 'spine' in device_interface.device.name and 'border' in device_interface.connected_endpoint.device.name %}{# i-012: looking for neighbors #}
+{% for device_all_ips in get_all_ip.results %}{# f-009: list all IP from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-010: list all IP per device #}
+{% if device_interface.connected_endpoint.device.name == device_ip.interface.device.name and device_interface.connected_endpoint.name == device_ip.interface.name %}{# i-012: matchin peer IP addresses #}
+    neighbor {{ device_ip.address.split('/') | first }} 
+        remote-as {% for peer_device in get_devices.json.results %}{% if peer_device.name == device_ip.interface.device.name %}{{ peer_device.local_context_data.bgp_asn }}{% endif %}{% endfor %}
+
+        use neighbor-group IPV{{ device_ip.family.value }}_BGP_FABRIC
+    !
+{% endif %}{# i-012: matchin peer IP addresses #}
+{% endfor %}{# f-010: list all IP per device #}
+{% endfor %}{# f-009: list all IP from all devices #}
+    !
+{% endif %}{# i-012: looking for neighbors #}
+{% endif %}{# i-011: matching only proper interfaces #}
+{% endfor %}{# f-008: list all interfaces per device #}
+{% endfor %}{# f-007: list all interfaces from all devices #}
+!

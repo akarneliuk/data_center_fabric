@@ -39,7 +39,7 @@
       src: "{{ device_item.platform.slug }}.j2"
       dest: "{{ working_folder }}/{{ device_item.name }}/{{ device_item.name }}.conf"
 
-- name: CONFIGURATION LOOP // CONFIGURING {{ device_item.name }}
+- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }}
   nclu:
       atomic: yes
       template: "{{ lookup('template', '{{ device_item.platform.slug }}.j2') }}"
@@ -51,7 +51,7 @@
       ansible_ssh_pass: "{{ cumulus.pass }}"
   when: device_item.platform.slug == 'cumulus-linux'
 
-- name: CONFIGURATION LOOP // CONFIGURING {{ device_item.name }}
+- name: CONFIGURATION LOOP // ARISTA // CONFIGURING {{ device_item.name }}
   local_action:
       module: "eos_config"
       authorize: true
@@ -62,6 +62,19 @@
           username: "{{ arista.user }}"
           password: "{{ arista.pass }}"
           auth_pass: "{{ arista.pass }}"
+  ignore_errors: yes
+  ignore_unreachable: yes
   when: device_item.platform.slug == 'arista-eos'
 
+- name: CONFIGURATION LOOP // ARISTA // CONFIGURING {{ device_item.name }}
+  local_action:
+      module: "iosxr_config"
+      src: "{{ working_folder }}/{{ device_item.name }}/{{ device_item.name }}.conf"
+      provider:
+          host: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
+          username: "{{ cisco.user }}"
+          password: "{{ cisco.pass }}"
+  ignore_errors: yes
+  ignore_unreachable: yes
+  when: device_item.platform.slug == 'cisco-ios-xr'
 ...
