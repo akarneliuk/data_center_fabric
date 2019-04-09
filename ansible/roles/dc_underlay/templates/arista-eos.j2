@@ -81,12 +81,10 @@ router bgp {{ device_item.local_context_data.bgp_asn }}
     maximum-paths 4
     !
     neighbor IPV4_BGP_FABRIC peer-group
-    neighbor IPV4_BGP_FABRIC update-source Loopback0
     neighbor IPV4_BGP_FABRIC timers {{ bgp.send }} {{ bgp.receive }} 
     neighbor IPV4_BGP_FABRIC password {{ bgp.password }}
     !
     neighbor IPV6_BGP_FABRIC peer-group
-    neighbor IPV6_BGP_FABRIC update-source Loopback0
     neighbor IPV6_BGP_FABRIC timers {{ bgp.send }} {{ bgp.receive }}
     neighbor IPV6_BGP_FABRIC password {{ bgp.password }}
     !

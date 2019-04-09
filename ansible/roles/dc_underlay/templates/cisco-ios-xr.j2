@@ -44,7 +44,6 @@ router bgp {{ device_item.local_context_data.bgp_asn }}
         maximum-paths ebgp 4
     !
     address-family l2vpn evpn
-        maximum-paths ebgp 4
     !
     af-group L2VPN_EVPN_AF address-family l2vpn evpn
         send-community-ebgp
@@ -68,7 +67,6 @@ router bgp {{ device_item.local_context_data.bgp_asn }}
     session-group BGP_PEERS
         password {{ bgp.password }}
         timers {{ bgp.send }} {{ bgp.receive }}
-        update-source Loopback0
     !
     neighbor-group IPV4_BGP_FABRIC
         use session-group BGP_PEERS
