@@ -77,6 +77,9 @@ mlag configuration
 ! 5. BGP
 !
 router bgp {{ device_item.local_context_data.bgp_asn }}
+    bgp bestpath as-path multipath-relax
+    maximum-paths 4
+    !
     neighbor IPV4_BGP_FABRIC peer-group
     neighbor IPV4_BGP_FABRIC update-source Loopback0
     neighbor IPV4_BGP_FABRIC timers {{ bgp.send }} {{ bgp.receive }} 

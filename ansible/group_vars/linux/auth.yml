@@ -21,10 +21,4 @@ cisco:
 arista:
     user: aaa
     pass: aaa
-
-# Some fabric parameters:
-bgp:
-    password: DC_F@BR!C$
-    send: 10
-    receive: 30
 ...

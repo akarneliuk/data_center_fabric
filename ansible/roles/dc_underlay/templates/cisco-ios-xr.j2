@@ -35,12 +35,16 @@ end-policy
 !
 router bgp {{ device_item.local_context_data.bgp_asn }}
     bgp log neighbor changes detail
+    bgp bestpath as-path multipath-relax
     !
     address-family ipv4 unicast
+        maximum-paths ebgp 4
     !
     address-family ipv6 unicast
+        maximum-paths ebgp 4
     !
     address-family l2vpn evpn
+        maximum-paths ebgp 4
     !
     af-group L2VPN_EVPN_AF address-family l2vpn evpn
         send-community-ebgp
