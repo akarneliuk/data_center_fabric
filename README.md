@@ -10,7 +10,7 @@ This project is a sister of another my project `Service Provider Fabric`. At som
 
 # Version
 
-The current version of this repository is `0.2`.
+The current version of this repository is `0.3`.
 
 # Prerequisites
 
@@ -29,3 +29,8 @@ Version `0.1.1`.
 Version `0.2`.
 1. Automatic provisioning of Arista EOS for underlay IP Fabric.
 2. Automatic provisioning of Cisco IOS XR for underlay IP Fabric.
+
+Version `0.3'.
+1. Added folder `containers` with Dockerfiles for infrastructure enablers.
+2. Folder `containers\dns` contains the Dockerfile for DNS Server based on BIND9 and Alpine Linux base image.
+3. Folder `contaienrs\ftp` contains the Dockerfile for FTP Server based on VSFTP and Alpine Linux base image.
