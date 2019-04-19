@@ -34,3 +34,4 @@ Version `0.3'.
 1. Added folder `containers` with Dockerfiles for infrastructure enablers.
 2. Folder `containers\dns` contains the Dockerfile for DNS Server based on BIND9 and Alpine Linux base image.
 3. Folder `contaienrs\ftp` contains the Dockerfile for FTP Server based on VSFTP and Alpine Linux base image.
+3. Folder `contaienrs\http` contains the Dockerfile for FTP Server based on NGINX and Alpine Linux base image.
