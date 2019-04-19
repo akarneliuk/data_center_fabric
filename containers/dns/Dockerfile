@@ -6,10 +6,6 @@ ENV REFRESHED_AT 2019-04-16
 
 RUN apk update; apk add bind
 
-RUN echo "#!/bin/sh" >> /entrypoint.sh \
-  && echo "/usr/sbin/named -f -g" >> /entrypoint.sh
-RUN chmod 750 /entrypoint.sh
-
 EXPOSE 53/tcp 53/udp
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/usr/sbin/named", "-f", "-g"]
