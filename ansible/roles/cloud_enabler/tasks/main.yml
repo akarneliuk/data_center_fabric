@@ -1,0 +1,41 @@
+---
+- name: CREATING FOLDER FOR ALL CONTAINERS
+  file:
+      dest: "{{ docker.path_to_containers }}"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: GETTING PWD
+  command: pwd
+  register: pwd
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+
+- name: SETTING PWD VARIABLE
+  set_fact:
+      pwd_actual: "{{ pwd.stdout }}"
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+
+- name: STARTING COLLECTION LOOP ...
+  include_tasks: collection_loop.yml
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+
+- name: BUILDING CONTAINERS ...
+  include_tasks: "container_{{ container_item }}.yml"
+  loop:
+      - dcf_dhcp
+      - dcf_dns
+      - dcf_ftp
+      - dcf_http
+  loop_control:
+      loop_var: container_item
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+...

@@ -1,0 +1,66 @@
+---
+- name: CONTAINER WITH {{ container_item }} // CREATING FOLDER 
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOLDER
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING ZONES FOLDER
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING CONFIG
+  template:
+      src: named.j2
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/named.conf"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING FORWARD ZONE
+  template:
+      src: dns_forward_zone.j2
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones/de.karnet.com.zone"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING REVERSE IPV4 ZONE 
+  template:
+      src: dns_reverse_zone_ipv4.j2
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones/1.168.192.in-addr.arpa.zone"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING REVERSE IPV6 ZONE 
+  template:
+      src: dns_reverse_zone_ipv6.j2
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones/8.6.1.0.2.9.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.c.f.ip6.arpa.zone"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // LAUNCHING CONTAINER
+  docker_container:
+      name: "{{ container_item }}"
+      image: "{{ docker.repo }}/{{ container_item }}"
+      state: started
+      ports:
+           - "192.168.1.1:53:53"
+           - "192.168.1.1:53:53/udp"
+      volumes:
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/named.conf:/etc/bind/named.conf:ro"
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/zones:/var/bind/zones"
+  become: yes
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+...

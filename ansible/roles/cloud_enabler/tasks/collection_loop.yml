@@ -1,25 +1,20 @@
 ---
-- name: CREATING TEMPORARY FOLDER
-  file:
-      dest: "{{ working_folder }}"
-      state: directory
-  tags:
-      - configure_underlay
-
-- name: GETTING INFO ABOUT NETBOX CONTAINER
+- name: COLLECTION LOOP // GETTING INFO ABOUT NETBOX CONTAINER
   shell: "sudo docker container port {{ netbox_frontend_container }}"
   become: yes
   register: netbox_frontend_container_port
   tags:
-      - configure_underlay
+      - infra_enabler_install
+      - infra_enabler_ops
 
-- name: SETTING API PORT
+- name: COLLECTION LOOP // SETTING API PORT
   set_fact:
       netbox_port: "{{ netbox_frontend_container_port.stdout | regex_replace('^.*:(\\d+)$', '\\1') }}"
   tags:
-      - configure_underlay
+      - infra_enabler_install
+      - infra_enabler_ops
 
-- name: GETTING LIST OF DEVICES
+- name: COLLECTION LOOP // GETTING LIST OF DEVICES
   uri:
       url: "http://{{ netbox_host }}:{{ netbox_port }}/api/dcim/devices/"
       method: GET
@@ -29,9 +24,10 @@
           Authorization: "Token {{ netbox_token }}"
   register: get_devices
   tags:
-      - configure_underlay
+      - infra_enabler_install
+      - infra_enabler_ops
 
-- name: GETTING LIST OF ALL INTERFACES
+- name: COLLECTION LOOP // GETTING LIST OF ALL INTERFACES
   uri:
       url: "http://{{ netbox_host }}:{{ netbox_port }}/api/dcim/interfaces/?device={{ item.name }}"
       method: GET
@@ -42,9 +38,10 @@
   register: get_all_interfaces
   loop: "{{ get_devices.json.results }}"
   tags:
-      - configure_underlay
+      - infra_enabler_install
+      - infra_enabler_ops
 
-- name: GETTING LIST OF ALL IP ADDRESSES
+- name: COLLECTION LOOP // GETTING LIST OF ALL IP ADDRESSES
   uri:
       url: "http://{{ netbox_host }}:{{ netbox_port }}/api/ipam/ip-addresses/?device={{ item.name }}"
       method: GET
@@ -55,22 +52,6 @@
   register: get_all_ip
   loop: "{{ get_devices.json.results }}"
   tags:
-      - configure_underlay
-
-# Commented as should be used only for debug purposes
-#- name: READING LIST OF ALL IP ADDRESSES
-#  debug:
-#      msg: "{{ item.json.results }}"
-#  loop: "{{ get_all_ip.results }}"
-#  tags:
-#      - configure_underlay
-
-- name: STARTING CONFIGURATION LOOP
-  include_tasks: configuration_loop.yml
-  loop: "{{ get_devices.json.results }}"
-  loop_control:
-      loop_var: device_item
-  tags:
-      - configure_underlay
+      - infra_enabler_install
+      - infra_enabler_ops
 ...
-

@@ -10,7 +10,7 @@ This project is a sister of another my project `Service Provider Fabric`. At som
 
 # Version
 
-The current version of this repository is `0.3`.
+The current version of this repository is `0.3.1`.
 
 # Prerequisites
 
@@ -36,3 +36,7 @@ Version `0.3`.
 3. Folder `contaienrs\ftp` contains the Dockerfile for FTP Server based on VSFTP and Alpine Linux base image.
 4. Folder `contaienrs\http` contains the Dockerfile for HTTP Server based on NGINX and Alpine Linux base image.
 5. Folder `contaienrs\dhcp` contains the Dockerfile for DHCP Server based on ISC DHCP and Alpine Linux base image.
+
+Version `0.3.1`.
+1. The role `cloud_docker` is copied from `The Service Provider Fabric` to setup the Docker on CentOS.
+2. New role `cloud_enabler` is created to bring life DHCP, DNS, FTP and HTTP services automatically. More details in `ansible\README.md`.

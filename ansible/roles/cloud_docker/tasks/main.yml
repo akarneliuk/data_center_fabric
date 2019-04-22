@@ -1,0 +1,111 @@
+---
+- name: INSTALLING NECESSARY TOOLS
+  yum:
+      name: "{{ item }}"
+      state: present
+  become: yes
+  loop:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+  tags:
+      - docker_install
+
+- name: ADDING DOCKER REPOSITORY
+  shell: "yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo"
+  become: yes
+  ignore_errors: yes
+  tags:
+      - docker_install
+
+- name: INSTALLING DOCKER
+  yum:
+      name: "{{ item }}"
+      state: present
+  become: yes
+  loop:
+      - docker-ce 
+      - docker-ce-cli 
+      - containerd.io
+  tags:
+      - docker_install
+
+- name: INSTALLING PIP PACKAGE FOR DOCKER
+  pip:
+      name: "{{ item }}"
+  become: yes
+  loop:
+      - docker
+  tags:
+      - docker_install
+
+- name: CREATING FILE FOR CUSTOMIZED DOCKER CONFIGURATION
+  file:
+      path: /etc/docker/daemon.json
+      state: touch
+  become: yes
+  tags:
+      - docker_install
+
+- name: ENABLING IPV6 ON DOCKER NETWORK
+  lineinfile:
+      path: /etc/docker/daemon.json
+      line: '{"ipv6": true, "fixed-cidr-v6": "fc00:ffff:1::/64"}'
+      state: present
+  become: yes
+  tags:
+      - docker_install
+
+- name: LAUNCHING DOCKER
+  service:
+      name: docker
+      state: started
+  become: yes
+  tags:
+      - docker_install
+      - docker_ops
+
+- name: ADDING RULES TO FW RULES FOR SNMP OVER IPV6 // DESTINATION
+  iptables:
+      rule_num: "{{ rule_index0 * 2 + 1 }}"
+      action: insert
+      ip_version: ipv6
+      chain: FORWARD
+      protocol: "{{ item.protocol }}"
+      destination_port: "{{ item.port }}"
+      jump: ACCEPT
+  become: yes
+  loop:
+      - { protocol: udp, port: 161, description: snmp }
+      - { protocol: udp, port: 53, description: dns  }
+      - { protocol: tcp, port: 53, description: dns }
+      - { protocol: udp, port: 546, description: dhcpv6_client  }
+      - { protocol: udp, port: 547, description: dhcpv6_server  }
+  loop_control:
+      index_var: rule_index0
+  tags:
+      - docker_install
+      - docker_ops
+
+- name: ADDING RULES TO FW RULES FOR SNMP OVER IPV6 // SOURCE
+  iptables:
+      rule_num: "{{ rule_index0 * 2 + 2 }}"
+      action: insert
+      ip_version: ipv6
+      chain: FORWARD
+      protocol: "{{ item.protocol }}"
+      source_port: "{{ item.port }}"
+      jump: ACCEPT
+  become: yes
+  loop:
+      - { protocol: udp, port: 161, description: snmp }
+      - { protocol: udp, port: 53, description: dns  }
+      - { protocol: tcp, port: 53, description: dns }
+      - { protocol: udp, port: 546, description: dhcpv6_client  }
+      - { protocol: udp, port: 547, description: dhcpv6_server  }
+  loop_control:
+      index_var: rule_index0
+  tags:
+      - docker_install
+      - docker_ops
+...

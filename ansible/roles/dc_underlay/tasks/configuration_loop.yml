@@ -8,11 +8,15 @@
           accept: "application/json"
           Authorization: "Token {{ netbox_token }}"
   register: get_device_ports
+  tags:
+      - configure_underlay
 
 # Commented as should be used only for debug purposes
 #- name: CONFIGURATION LOOP // READING PORT DATA
 #  debug:
 #      msg: "{{ get_device_ports.json }}"
+#  tags:
+#      - configure_underlay
 
 - name: CONFIGURATION LOOP // GETING IP CONFIG
   uri:
@@ -23,21 +27,29 @@
           accept: "application/json"
           Authorization: "Token {{ netbox_token }}"
   register: get_device_ip
+  tags:
+      - configure_underlay
 
 # Commented as should be used only for debug purposes
 #- name: CONFIGURATION LOOP // READING IP DATA
 #  debug:
 #      msg: "{{ get_device_ip.json }}"
+#  tags:
+#      - configure_underlay
 
 - name: CONFIGURATION LOOP // CREATING TEMPORARY FOLDER FOR {{ device_item.name }}
   file:
       dest: "{{ working_folder }}/{{ device_item.name }}"
       state: directory
+  tags:
+      - configure_underlay
 
 - name: CONFIGURATION LOOP // TEMPLATING CONFIG FOR {{ device_item.name }}
   template:
       src: "{{ device_item.platform.slug }}.j2"
       dest: "{{ working_folder }}/{{ device_item.name }}/{{ device_item.name }}.conf"
+  tags:
+      - configure_underlay
 
 - name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }}
   nclu:
@@ -50,6 +62,8 @@
       ansible_user: "{{ cumulus.user }}"
       ansible_ssh_pass: "{{ cumulus.pass }}"
   when: device_item.platform.slug == 'cumulus-linux'
+  tags:
+      - configure_underlay
 
 - name: CONFIGURATION LOOP // ARISTA // CONFIGURING {{ device_item.name }}
   local_action:
@@ -65,6 +79,8 @@
   ignore_errors: yes
   ignore_unreachable: yes
   when: device_item.platform.slug == 'arista-eos'
+  tags:
+      - configure_underlay
 
 - name: CONFIGURATION LOOP // ARISTA // CONFIGURING {{ device_item.name }}
   local_action:
@@ -77,4 +93,6 @@
   ignore_errors: yes
   ignore_unreachable: yes
   when: device_item.platform.slug == 'cisco-ios-xr'
+  tags:
+      - configure_underlay
 ...

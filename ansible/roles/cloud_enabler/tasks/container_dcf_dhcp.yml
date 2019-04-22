@@ -1,0 +1,35 @@
+---
+- name: CONTAINER WITH {{ container_item }} // CREATING FOLDER 
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOLDER
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING CONFIG
+  template:
+      src: dhcpd.j2
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/dhcpd.conf"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // LAUNCHING CONTAINER
+  docker_container:
+      name: "{{ container_item }}"
+      image: "{{ docker.repo }}/{{ container_item }}"
+      state: started
+      network_mode: host
+      volumes:
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/dhcpd.conf:/etc/dhcp/dhcpd.conf:ro"
+  become: yes
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+...

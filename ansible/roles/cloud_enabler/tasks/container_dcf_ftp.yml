@@ -1,0 +1,38 @@
+---
+- name: CONTAINER WITH {{ container_item }} // CREATING FOLDER 
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOLDER
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // COPYING FTP CONTENT
+  copy:
+      src: "{{ pwd_actual }}/files/infra_enabler/ftp/"
+      dest: "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // LAUNCHING CONTAINER
+  docker_container:
+      name: "{{ container_item }}"
+      image: "{{ docker.repo }}/{{ container_item }}"
+      state: started
+      ports:
+           - "20:20"
+           - "21:21"
+           - "{% for port in range(50000, 50051) %}{{port}}:{{port}}{% if not loop.last %},{% endif %}{% endfor %}"
+      volumes:
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data:/var/ftp/files"
+  become: yes
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+...

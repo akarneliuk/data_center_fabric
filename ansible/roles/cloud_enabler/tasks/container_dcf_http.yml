@@ -1,0 +1,59 @@
+---
+- name: CONTAINER WITH {{ container_item }} // CREATING FOLDER 
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOLDER
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING WEBSITE FOLDER
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/website"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING NGINX APP CONFIG
+  template:
+      src: nginx_app.j2
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/nginx.conf"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING NGINX WEBSITE CONFIG
+  template:
+      src: nginx_default_server.j2
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/default.conf"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // COPYING WEBSITE CONTENT
+  copy:
+      src: "{{ pwd_actual }}/files/infra_enabler/http/"
+      dest: "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/website"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // LAUNCHING CONTAINER
+  docker_container:
+      name: "{{ container_item }}"
+      image: "{{ docker.repo }}/{{ container_item }}"
+      state: started
+      ports:
+           - "80:80"
+      volumes:
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/nginx.conf:/etc/nginx/nginx.conf:ro"
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/default.conf:/etc/nginx/conf.d/default.conf:ro"
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/website:/var/www/html/website"
+  become: yes
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+...

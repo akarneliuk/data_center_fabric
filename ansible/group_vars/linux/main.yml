@@ -11,4 +11,9 @@ bgp:
     password: DC_F@BR!C$
     send: 10
     receive: 30
+
+# Defaults for Docker containers
+docker:
+    path_to_containers: containers
+    repo: akarneliuk
 ...

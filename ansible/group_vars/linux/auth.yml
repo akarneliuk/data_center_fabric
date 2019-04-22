@@ -7,17 +7,17 @@ ansible_become_pass: N3tw0rk!
 # Integration with NetBox
 netbox_token: 0123456789abcdef0123456789abcdef01234567
 
-# Day zero credentials Cumulus Linux
+# Day zero credentials for Cumulus Linux
 cumulus:
     user: cumulus
     pass: CumulusLinux!
 
-# Day zero credentials Cisco IOS XR
+# Day zero credentials for Cisco IOS XR
 cisco:
     user: cisco
     pass: cisco
 
-# Day zero credentials Cumulus Linux
+# Day zero credentials for Arista EOS
 arista:
     user: aaa
     pass: aaa

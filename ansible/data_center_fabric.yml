@@ -4,4 +4,6 @@
   gather_facts: yes
   roles:
       - dc_underlay
+      - cloud_docker
+      - cloud_enabler
 ...
