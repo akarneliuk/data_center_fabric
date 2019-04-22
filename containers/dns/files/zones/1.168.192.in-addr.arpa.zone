@@ -1,6 +1,6 @@
 $TTL 86400
 
-@ IN SOA de.karnet.com.      root.de.karnet.com. (
+@ IN SOA infra-enabler.de.karnet.com.      root.de.karnet.com. (
   100
   3600
   900
@@ -8,7 +8,7 @@ $TTL 86400
   86400
 )
 ; NS entries
-        IN      NS      de-bln-dns1.de.karnet.com.
+        IN      NS      infra-enabler.de.karnet.com.
 ; PTR entries
 21	IN	PTR	de-bln-leaf-111.de.karnet.com.
 22	IN      PTR     de-bln-leaf-112.de.karnet.com.
@@ -16,4 +16,4 @@ $TTL 86400
 24	IN      PTR     de-bln-leaf-212.de.karnet.com.
 25	IN      PTR     de-bln-spine-101.de.karnet.com.
 26	IN      PTR     de-bln-spine-201.de.karnet.com.
-143	IN      PTR     de-bln-dns1.de.karnet.com.
+1	IN      PTR     infra-enabler.de.karnet.com.

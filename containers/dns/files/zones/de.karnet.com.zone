@@ -1,6 +1,6 @@
 $TTL 86400
 
-@ IN SOA de-bln-dns1.de.karnet.com.	root.de.karnet.com. (
+@ IN SOA infra-enabler.de.karnet.com.	root.de.karnet.com. (
   100
   3600
   900
@@ -8,19 +8,19 @@ $TTL 86400
   86400
 )
 ; NS entries
-		IN	NS	de-bln-dns1.de.karnet.com.
+		IN	NS	infra-enabler.de.karnet.com.
 ; A/AAAA entries
-de-bln-leaf-111.de.karnet.com. 		IN	A	192.168.141.21
-					IN	AAAA	fc00:de:1:ffff::21
-de-bln-leaf-112.de.karnet.com.          IN      A       192.168.141.22
-                		        IN      AAAA    fc00:de:1:ffff::22
-de-bln-leaf-211.de.karnet.com.          IN      A       192.168.141.23
-               			        IN      AAAA    fc00:de:1:ffff::23
-de-bln-leaf-212.de.karnet.com.		IN      A       192.168.141.24
-                        		IN      AAAA    fc00:de:1:ffff::24
-de-bln-spine-101.de.karnet.com.	        IN      A       192.168.141.25
-                       			IN      AAAA    fc00:de:1:ffff::25
-de-bln-spine-201.de.karnet.com.         IN      A       192.168.141.26
-                        		IN      AAAA    fc00:de:1:ffff::26
-de-bln-dns1.de.karnet.com.		IN      A       192.168.141.143
-                        		IN      AAAA    fc00:de:1:ffff::143
+de-bln-leaf-111.de.karnet.com. 		IN	A	192.168.1.21
+					IN	AAAA	fc00::192:168:1:21
+de-bln-leaf-112.de.karnet.com.          IN      A       192.168.1.22
+                		        IN      AAAA    fc00::192:168:1:22
+de-bln-leaf-211.de.karnet.com.          IN      A       192.168.1.23
+               			        IN      AAAA    fc00::192:168:1:23
+de-bln-leaf-212.de.karnet.com.		IN      A       192.168.1.24
+                        		IN      AAAA    fc00::192:168:1:24
+de-bln-spine-101.de.karnet.com.	        IN      A       192.168.1.25
+                       			IN      AAAA    fc00::192:168:1:25
+de-bln-spine-201.de.karnet.com.         IN      A       192.168.1.26
+                        		IN      AAAA    fc00::192:168:1:26
+infra-enabler.de.karnet.com.		IN      A       192.168.1.1
+                        		IN      AAAA    fc00::192:168:1:1

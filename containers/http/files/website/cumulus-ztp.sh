@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#Cumulus Linux Autoprovisioning start
+# CUMULUS-AUTOPROVISIONING
 
 sleep 5
 
 net add vrf mgmt
 net add time zone 
-net add dns nameserver ipv4 192.168.141.143 vrf mgmt
+net add dns nameserver ipv4 192.168.1.1 vrf mgmt
 net commit
 
 adduser aaa --disabled-password --gecos "Network Admin User Account"
@@ -15,4 +15,3 @@ echo "aaa:aaa" | chpasswd
 
 exit 0
 
-#Cumulus Linux Autoprovisioning done
