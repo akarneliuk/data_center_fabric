@@ -1,7 +1,9 @@
 # HTTP Server for the Data Centre Fabric
 
 To generate the Docker image:
-`sudo docker image build -t akarneliuk\dcf_http .`
+```
+sudo docker image build -t akarneliuk\dcf_http .
+```
 
 To use:
 ```
