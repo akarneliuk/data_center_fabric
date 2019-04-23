@@ -54,4 +54,17 @@
   tags:
       - infra_enabler_install
       - infra_enabler_ops
+
+- name: COLLECTION LOOP // GETTING LIST OF PREFIXES
+  uri:
+      url: "http://{{ netbox_host }}:{{ netbox_port }}/api/ipam/prefixes/"
+      method: GET
+      return_content: yes
+      headers:
+          accept: "application/json"
+          Authorization: "Token {{ netbox_token }}"
+  register: get_all_ip_prefixes
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
 ...

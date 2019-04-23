@@ -30,14 +30,14 @@
 - name: CONTAINER WITH {{ container_item }} // TEMPLATING FORWARD ZONE
   template:
       src: dns_forward_zone.j2
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones/de.karnet.com.zone"
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones/{{ domain_name }}.zone"
   tags:
       - infra_enabler_install
 
 - name: CONTAINER WITH {{ container_item }} // TEMPLATING REVERSE IPV4 ZONE 
   template:
       src: dns_reverse_zone_ipv4.j2
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones/1.168.192.in-addr.arpa.zone"
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones/{{ lookup('template', 'dns_reverse_zone_ipv4_name.j2') | replace('\n', '') }}in-addr.arpa.zone"
   tags:
       - infra_enabler_install
 

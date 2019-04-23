@@ -1,6 +1,6 @@
 $TTL 86400
 
-@ IN SOA infra-enabler.de.karnet.com.	root.de.karnet.com. (
+@ IN SOA {% for device in get_devices.json.results %}{% if device.site.slug == 'bln' and 'infra-srv' in device.name %}{{ device.name }}{% endif %}{% endfor %}.{{ domain_name }}.	root.{{ domain_name }}. (
   100
   3600
   900
@@ -8,19 +8,20 @@ $TTL 86400
   86400
 )
 ; NS entries
-		IN	NS	infra-enabler.de.karnet.com.
+		IN	NS	{% for device in get_devices.json.results %}{% if device.site.slug == 'bln' and 'infra-srv' in device.name %}{{ device.name }}{% endif %}{% endfor %}.{{ domain_name }}.
 ; A/AAAA entries
-de-bln-leaf-111.de.karnet.com. 		IN	A	192.168.1.21
-					IN	AAAA	fc00::192:168:1:21
-de-bln-leaf-112.de.karnet.com.          IN      A       192.168.1.22
-                		        IN      AAAA    fc00::192:168:1:22
-de-bln-leaf-211.de.karnet.com.          IN      A       192.168.1.23
-               			        IN      AAAA    fc00::192:168:1:23
-de-bln-leaf-212.de.karnet.com.		IN      A       192.168.1.24
-                        		IN      AAAA    fc00::192:168:1:24
-de-bln-spine-101.de.karnet.com.	        IN      A       192.168.1.25
-                       			IN      AAAA    fc00::192:168:1:25
-de-bln-spine-201.de.karnet.com.         IN      A       192.168.1.26
-                        		IN      AAAA    fc00::192:168:1:26
-infra-enabler.de.karnet.com.		IN      A       192.168.1.1
-                        		IN      AAAA    fc00::192:168:1:1
+{% for device in get_devices.json.results %}{# f-001: looping all devices #}
+{% if device.site.slug == 'bln' %}{# i-001: matching Berlin devices #}
+{{ device.name }}.{{ domain_name }}.{% for ip_prefix in get_all_ip_prefixes.json.results %}{# f-002: looping all prefixes #}
+{% if ip_prefix.site.slug == 'bln' and ip_prefix.role.slug == 'oob-management' %}{# i-002: matching OOB subent for Berlin #}
+{% for device_all_ips in get_all_ip.results %}{# f-003: list all IPs from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-004: list all IPs per device #}
+{% if device.name == device_ip.interface.device.name and device_ip.address | ipaddr('network') == ip_prefix.prefix | ipaddr('network') %}{# i-003: checking entry #}
+	IN	{% if device_ip.family.value == 4 %}A{% else %}AAAA{% endif %}	{{ device_ip.address.split('/') | first }} 
+{% endif %}{# i-003: checking entry #}
+{% endfor %}{# f-004: list all IPs per device #}
+{% endfor %}{# f-003: list all IPs from all devices #}
+{% endif %}{# i-002: matching OOB subent for Berlin #}
+{% endfor %}{# f-002: looping all prefixes #}
+{% endif %}{# i-001: matching berlin devices #}
+{% endfor %}{# f-001: looping all devices #}

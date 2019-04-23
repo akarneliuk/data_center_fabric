@@ -2,14 +2,15 @@ options {
 	directory "/var/bind";
 
 	allow-recursion {
-		127.0.0.1/32;
-                192.168.0.0/16;
-                172.17.0.0/16;
-                fc00:de::/32;
+{% for ip_prefix in get_all_ip_prefixes.json.results %}{# f-001: looping all prefixes #}
+{% if ip_prefix.site.slug == 'bln' and ip_prefix.role.slug == 'oob-management' %}{# i-001: matching IPv4 OOB subent for Berlin #}
+		{{ ip_prefix.prefix }};
+{% endif %}{# i-001: matching IPv4 OOB subent for Berlin #}
+{% endfor %}{# f-001: looping all prefixes #}
 	};
 
 	forwarders {
-		172.17.0.1;	
+		192.168.141.2;	
 	};
 
 	listen-on {
@@ -26,23 +27,35 @@ options {
 	allow-transfer { none; };
 };
 
-zone "de.karnet.com" IN {
+{% if domain_name is defined %}{# i-002: checking if the domain name is defined #}
+zone "{{ domain_name }}" IN {
         type master;
-        file "zones/de.karnet.com.zone";
+        file "zones/{{ domain_name }}.zone";
+        allow-update { none; };
+        notify no;
+};
+{% endif %}{# i-002: checking if the domain name is defined #}
+
+{% for ip_prefix in get_all_ip_prefixes.json.results %}{# f-002: looping all prefixes #}
+{% if ip_prefix.site.slug == 'bln' and ip_prefix.role.slug == 'oob-management' %}{# i-003: matching IPv4 OOB subent for Berlin #}
+{% if ip_prefix.family.value == 4 %}{# i-004: checking the address family of the subnet #}
+{% set temp_prefix = ip_prefix.prefix.split('/') | first %}
+
+zone "{% if temp_prefix.split('.')[3] != '0' %}{{ temp_prefix.split('.')[3] }}.{% endif %}{% if temp_prefix.split('.')[2] != '0' or (temp_prefix.split('.')[2] == '0' and temp_prefix.split('.')[3] != '0') %}{{ temp_prefix.split('.')[2] }}.{% endif %}{% if temp_prefix.split('.')[1] != '0' or (temp_prefix.split('.')[1] == '0' and (temp_prefix.split('.')[2] != '0' or temp_prefix.split('.')[3] != '0')) %}{{ temp_prefix.split('.')[1] }}.{% endif %}{% if temp_prefix.split('.')[0] != '0' or (temp_prefix.split('.')[0] == '0' and (temp_prefix.split('.')[1] != '0' or temp_prefix.split('.')[2] != '0' or temp_prefix.split('.')[3] != '0')) %}{{ temp_prefix.split('.')[0] }}.{% endif %}in-addr.arpa" IN {
+        type master;
+        file "zones/{% if temp_prefix.split('.')[3] != '0' %}{{ temp_prefix.split('.')[3] }}.{% endif %}{% if temp_prefix.split('.')[2] != '0' or (temp_prefix.split('.')[2] == '0' and temp_prefix.split('.')[3] != '0') %}{{ temp_prefix.split('.')[2] }}.{% endif %}{% if temp_prefix.split('.')[1] != '0' or (temp_prefix.split('.')[1] == '0' and (temp_prefix.split('.')[2] != '0' or temp_prefix.split('.')[3] != '0')) %}{{ temp_prefix.split('.')[1] }}.{% endif %}{% if temp_prefix.split('.')[0] != '0' or (temp_prefix.split('.')[0] == '0' and (temp_prefix.split('.')[1] != '0' or temp_prefix.split('.')[2] != '0' or temp_prefix.split('.')[3] != '0')) %}{{ temp_prefix.split('.')[0] }}.{% endif %}in-addr.arpa.zone";
         allow-update { none; };
         notify no;
 };
 
-zone "1.168.192.in-addr.arpa" IN {
-        type master;
-        file "zones/1.168.192.in-addr.arpa.zone";
-        allow-update { none; };
-        notify no;
-};
-
+{% elif ip_prefix.family.value == 6 %}{# i-004: checking the address family of the subnet #}
 zone "8.6.1.0.2.9.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.c.f.ip6.arpa" IN {
         type master;
         file "zones/8.6.1.0.2.9.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.c.f.ip6.arpa.zone";
         allow-update { none; };
         notify no;
 };
+
+{% endif %}{# i-004: checking the address family of the subnet #}
+{% endif %}{# i-003: matching IPv4 OOB subent for Berlin #}
+{% endfor %}{# f-002: looping all prefixes #}

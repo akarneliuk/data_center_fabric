@@ -16,4 +16,7 @@ bgp:
 docker:
     path_to_containers: containers
     repo: akarneliuk
+
+# Domain name (perhaps, should be moved to NetBox)
+domain_name: de.karnet.com
 ...

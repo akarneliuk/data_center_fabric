@@ -8,20 +8,45 @@ max-lease-time 7200;
 
 authoritative;
 
-#  IPv4 OOB management subnet for the data center `DE` `Berlin`
-subnet 192.168.1.0 netmask 255.255.255.0 {
-  range 192.168.1.129 192.168.1.254;
-  option domain-name-servers 192.168.1.1;
-  option domain-name "de.karnet.com";
-  option routers 192.168.1.1;
-  option broadcast-address 192.168.1.255;
+{% for ip_prefix in get_all_ip_prefixes.json.results %}{# f-001: looping all prefixes #}
+{% if ip_prefix.site.slug == 'bln' and ip_prefix.role.slug == 'oob-management' and ip_prefix.family.value == 4 %}{# i-001: matching IPv4 OOB subent for Berlin #}
+# {{ ip_prefix.description }} // dynamic lease
+subnet {{ ip_prefix.prefix | ipaddr('network') }} netmask {{ ip_prefix.prefix | ipaddr('netmask') }} {
+  range {{ ip_prefix.prefix | ipaddr('network') | ipmath (129) }} {{ ip_prefix.prefix | ipaddr('network') | ipmath (254) }};
+  option domain-name-servers {% for device in get_devices.json.results %}{% if device.site.slug == 'bln' and 'infra-srv' in device.name %}{{ device.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %};
+  option domain-name "{{ domain_name }}";
+  option routers {{ ip_prefix.prefix | ipaddr('network') | ipmath (1) }};
+  option broadcast-address {{ ip_prefix.prefix | ipaddr('broadcast') }};
 }
 
-# IPv4 OOB // Fixed lease
-host de-bln-leaf-111 {
-  hardware ethernet 52:54:00:06:02:00;
-  fixed-address 192.168.1.21;
-  option host-name "de-bln-leaf-111";
-  option cumulus-provision-url "http://192.168.1.1/cumulus-ztp.sh";
+# {{ ip_prefix.description }} // fixed lease
+{% for device_all_ips in get_all_ip.results %}{# f-002: list all IPs from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-003: list all IPs per device #}
+{% if device_ip.address | ipaddr('network') == ip_prefix.prefix | ipaddr('network') %}{# i-002: looking for interfaces matching OOB subnet #}
+{% for device_all_interfaces in get_all_interfaces.results %}{# f-004: list all interfaces from all devices #}
+{% for device_interface in device_all_interfaces.json.results %}{# f-005: list all interfaces per device #}
+{% if device_ip.interface.device.name == device_interface.device.name and device_interface.mac_address != None %}{# i-003: checking there is MAC provided #}
+host {{ device_ip.interface.device.name }} {
+  hardware ethernet {{ device_interface.mac_address}};
+  fixed-address {{ device_ip.address | ipaddr('address') }};
+  option host-name "{{ device_ip.interface.device.name }}";
+{# Adding vendor-specific entries for ZTP #}
+{% for device in get_devices.json.results %}{# f-006: loopling all devices #}
+{% if device_ip.interface.device.name == device.name %}{# i-004: matching proper device #}
+{% if device.platform.slug == 'cumulus-linux' %}{# i-005: adding Cumulus specific stuff #}
+  option cumulus-provision-url "http://{% for d_in in get_devices.json.results %}{% if d_in.site.slug == 'bln' and 'infra-srv' in d_in.name %}{{ d_in.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %}/cumulus-ztp.sh";
+{% endif %}{# i-005: adding Cumulus specific stuff #}
+{% endif %}{# i-004: matching proper device #}
+{% endfor %}{# f-006: loopling all devices #}
 }
+
+{% endif %}{# i-003: checking there is MAC provided #}
+{% endfor %}{# f-005: list all interfaces per device #}
+{% endfor %}{# f-004: list all interfaces from all devices #}
+{% endif %}{# i-002: looking for interfaces matching OOB subnet #}
+{% endfor %}{# f-003: list all IPs per device #}
+{% endfor %}{# f-002: list all IPs from all devices #}
+
+{% endif %}{# i-001: matching IPv4 OOB subent for Berlin #}
+{% endfor %}{# f-001: looping all prefixes #}
 

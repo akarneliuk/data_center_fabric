@@ -10,7 +10,7 @@ This project is a sister of another my project `Service Provider Fabric`. At som
 
 # Version
 
-The current version of this repository is `0.3.1`.
+The current version of this repository is `0.3.2`.
 
 # Prerequisites
 
@@ -40,3 +40,8 @@ Version `0.3`.
 Version `0.3.1`.
 1. The role `cloud_docker` is copied from `The Service Provider Fabric` to setup the Docker on CentOS.
 2. New role `cloud_enabler` is created to bring life DHCP, DNS, FTP and HTTP services automatically. More details in `ansible\README.md`.
+
+Version `0.3.2`.
+1. The DHCP config file `dhcpd.conf` is automatically populated with data from NetBox over REST API using Ansible. The information is populated for the data centre `bln`.
+2. The DNS config file `named.cond` is automatically populated with data from NetBox over REST API using Ansible. The information is populated for the data centre `bln`.
+3. The DNS forward zone is automatically filled with info from NetBox.
