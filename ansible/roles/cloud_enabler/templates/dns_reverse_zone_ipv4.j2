@@ -1,6 +1,6 @@
 $TTL 86400
 
-@ IN SOA infra-enabler.de.karnet.com.      root.de.karnet.com. (
+@ IN SOA {% for device in get_devices.json.results %}{% if device.site.slug == 'bln' and 'infra-srv' in device.name %}{{ device.name }}{% endif %}{% endfor %}.{{ domain_name }}.	root.{{ domain_name }}. (
   100
   3600
   900
@@ -8,12 +8,18 @@ $TTL 86400
   86400
 )
 ; NS entries
-        IN      NS      infra-enabler.de.karnet.com.
+        IN      NS      {% for device in get_devices.json.results %}{% if device.site.slug == 'bln' and 'infra-srv' in device.name %}{{ device.name }}{% endif %}{% endfor %}.{{ domain_name }}.
 ; PTR entries
-21	IN	PTR	de-bln-leaf-111.de.karnet.com.
-22	IN      PTR     de-bln-leaf-112.de.karnet.com.
-23	IN      PTR     de-bln-leaf-211.de.karnet.com.
-24	IN      PTR     de-bln-leaf-212.de.karnet.com.
-25	IN      PTR     de-bln-spine-101.de.karnet.com.
-26	IN      PTR     de-bln-spine-201.de.karnet.com.
-1	IN      PTR     infra-enabler.de.karnet.com.
+{% for ip_prefix in get_all_ip_prefixes.json.results %}{# f-001: looping all prefixes #}
+{% if ip_prefix.site.slug == 'bln' and ip_prefix.role.slug == 'oob-management' and ip_prefix.family.value == 4 %}{# i-001: matching OOB subent for Berlin #}
+{% for device_all_ips in get_all_ip.results %}{# f-002: list all IPs from all devices #}
+{% for device_ip in device_all_ips.json.results %}{# f-003: list all IPs per device #}
+{% if device_ip.address | ipaddr('network') == ip_prefix.prefix | ipaddr('network') %}{# i-002: matching proper interfaces #}
+{% set temp_subnet = ip_prefix.prefix.split('/') | first %}
+{% set temp_host = device_ip.address.split('/') | first %}
+{% if temp_host.split('.')[3] != temp_subnet.split('.')[3] or temp_host.split('.')[2] != temp_subnet.split('.')[2] or temp_host.split('.')[1] != temp_subnet.split('.')[1] or temp_host.split('.')[0] != temp_subnet.split('.')[0] %}{{ temp_host.split('.')[3] }}{% endif %}{% if temp_host.split('.')[2] != temp_subnet.split('.')[2] or temp_host.split('.')[1] != temp_subnet.split('.')[1] or temp_host.split('.')[0] != temp_subnet.split('.')[0] %}.{{ temp_host.split('.')[2] }}{% endif %}{% if temp_host.split('.')[1] != temp_subnet.split('.')[1] or temp_host.split('.')[0] != temp_subnet.split('.')[0] %}.{{ temp_host.split('.')[1] }}{% endif %}{% if temp_host.split('.')[0] != temp_subnet.split('.')[0] %}.{{ temp_host.split('.')[0] }}{% endif %}	IN	PTR	{{ device_ip.interface.device.name }}.{{ domain_name }}. 
+{% endif %}{# i-002: matching proper interfaces #}
+{% endfor %}{# f-003: list all IPs per device #}
+{% endfor %}{# f-002: list all IPs from all devices #}
+{% endif %}{# i-001: matching OOB subent for Berlin #}
+{% endfor %}{# f-001: looping all prefixes #}
