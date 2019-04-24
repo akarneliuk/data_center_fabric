@@ -44,6 +44,7 @@ Version `0.3.1`.
 Version `0.3.2`.
 1. The DHCP config file `dhcpd.conf` is automatically populated with data from NetBox over REST API using Ansible. The information is populated for the data centre `bln`.
 2. The DNS config file `named.cond` is automatically populated with data from NetBox over REST API using Ansible. The information is populated for the data centre `bln`.
-3. The filename for forward and reverse IPv4 zone is automatically generated based on the domain given in Ansible variables `group_vars/linux` and OOB subnet extracted from NetBox.
+3. The filename for forward and reverse zones (both IPv4 and IPv6) is automatically generated based on the domain given in Ansible variables `group_vars/linux` and OOB subnet extracted from NetBox.
 4. The DNS forward zone is automatically filled with info from NetBox over REST API using Ansible.
 5. The DNS reverse zone for IPv4 is automatically filled with info from NetBox over REST API using Ansible.
+6. The DNS reverse zone for IPv6 is automatically filled with info from NetBox over REST API using Ansible.

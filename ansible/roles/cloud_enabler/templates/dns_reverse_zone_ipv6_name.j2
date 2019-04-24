@@ -1,0 +1,7 @@
+{% for ip_prefix in get_all_ip_prefixes.json.results %}
+{% if ip_prefix.site.slug == 'bln' and ip_prefix.role.slug == 'oob-management' %}
+{% if ip_prefix.family.value == 6 %}
+{{ (ip_prefix.prefix | ipaddr('revdns'))[-(9+(ip_prefix.prefix|regex_replace('^.*/','')|int)//2):] }}
+{% endif %}
+{% endif %}
+{% endfor %}

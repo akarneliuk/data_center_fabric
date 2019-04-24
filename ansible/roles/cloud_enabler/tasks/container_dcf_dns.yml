@@ -44,7 +44,7 @@
 - name: CONTAINER WITH {{ container_item }} // TEMPLATING REVERSE IPV6 ZONE 
   template:
       src: dns_reverse_zone_ipv6.j2
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones/8.6.1.0.2.9.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.c.f.ip6.arpa.zone"
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/zones/{{ lookup('template', 'dns_reverse_zone_ipv6_name.j2') | replace('\n', '') }}zone"
   tags:
       - infra_enabler_install
 

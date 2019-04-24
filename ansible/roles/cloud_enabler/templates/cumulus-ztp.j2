@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# CUMULUS-AUTOPROVISIONING
+
+sleep 5
+
+net del dns nameserver ipv4 {% for device in get_devices.json.results %}{% if device.site.slug == 'bln' and 'infra-srv' in device.name %}{{ device.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %}
+
+net commit
+
+sleep 5
+
+net add vrf mgmt
+net add time zone 
+net add dns nameserver ipv4 {% for device in get_devices.json.results %}{% if device.site.slug == 'bln' and 'infra-srv' in device.name %}{{ device.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %} vrf mgmt
+net commit
+
+adduser aaa --disabled-password --gecos "Network Admin User Account"
+adduser aaa sudo
+echo "aaa:aaa" | chpasswd
+
+exit 0
+

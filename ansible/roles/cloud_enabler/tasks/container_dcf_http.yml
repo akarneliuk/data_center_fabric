@@ -41,6 +41,13 @@
   tags:
       - infra_enabler_install
 
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING CUMULUS ZTP SCRIPT
+  template:
+      src: cumulus-ztp.j2
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/website/cumulus-ztp.sh"
+  tags:
+      - infra_enabler_install
+
 - name: CONTAINER WITH {{ container_item }} // LAUNCHING CONTAINER
   docker_container:
       name: "{{ container_item }}"

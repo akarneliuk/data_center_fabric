@@ -1,1 +1,8 @@
-{% for ip_prefix in get_all_ip_prefixes.json.results -%}{% if ip_prefix.site.slug == 'bln' and ip_prefix.role.slug == 'oob-management' %}{% if ip_prefix.family.value == 4 %}{% set temp_prefix = ip_prefix.prefix.split('/') | first %}{% if temp_prefix.split('.')[3] != '0' %}{{ temp_prefix.split('.')[3] }}.{% endif %}{% if temp_prefix.split('.')[2] != '0' or (temp_prefix.split('.')[2] == '0' and temp_prefix.split('.')[3] != '0') %}{{ temp_prefix.split('.')[2] }}.{% endif %}{% if temp_prefix.split('.')[1] != '0' or (temp_prefix.split('.')[1] == '0' and (temp_prefix.split('.')[2] != '0' or temp_prefix.split('.')[3] != '0')) %}{{ temp_prefix.split('.')[1] }}.{% endif %}{%- if temp_prefix.split('.')[0] != '0' or (temp_prefix.split('.')[0] == '0' and (temp_prefix.split('.')[1] != '0' or temp_prefix.split('.')[2] != '0' or temp_prefix.split('.')[3] != '0')) -%}{{ temp_prefix.split('.')[0] }}.{% endif %}{% endif %}{% endif %}{%- endfor %}
+{% for ip_prefix in get_all_ip_prefixes.json.results %}
+{% if ip_prefix.site.slug == 'bln' and ip_prefix.role.slug == 'oob-management' %}
+{% if ip_prefix.family.value == 4 %}
+{% set temp_prefix = ip_prefix.prefix.split('/') | first %}
+{% if temp_prefix.split('.')[3] != '0' %}{{ temp_prefix.split('.')[3] }}.{% endif %}{% if temp_prefix.split('.')[2] != '0' or (temp_prefix.split('.')[2] == '0' and temp_prefix.split('.')[3] != '0') %}{{ temp_prefix.split('.')[2] }}.{% endif %}{% if temp_prefix.split('.')[1] != '0' or (temp_prefix.split('.')[1] == '0' and (temp_prefix.split('.')[2] != '0' or temp_prefix.split('.')[3] != '0')) %}{{ temp_prefix.split('.')[1] }}.{% endif %}{% if temp_prefix.split('.')[0] != '0' or (temp_prefix.split('.')[0] == '0' and (temp_prefix.split('.')[1] != '0' or temp_prefix.split('.')[2] != '0' or temp_prefix.split('.')[3] != '0')) %}{{ temp_prefix.split('.')[0] }}.{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
