@@ -54,8 +54,8 @@
       image: "{{ docker.repo }}/{{ container_item }}"
       state: started
       ports:
-           - "192.168.1.1:53:53"
-           - "192.168.1.1:53:53/udp"
+           - "{% for d_in in get_devices.json.results %}{% if d_in.site.slug == 'bln' and 'infra-srv' in d_in.name %}{{ d_in.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %}:53:53"
+           - "{% for d_in in get_devices.json.results %}{% if d_in.site.slug == 'bln' and 'infra-srv' in d_in.name %}{{ d_in.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %}:53:53/udp"
       volumes:
            - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/named.conf:/etc/bind/named.conf:ro"
            - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/zones:/var/bind/zones"
