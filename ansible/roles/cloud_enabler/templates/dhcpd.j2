@@ -33,9 +33,11 @@ host {{ device_ip.interface.device.name }} {
 {# Adding vendor-specific entries for ZTP #}
 {% for device in get_devices.json.results %}{# f-006: loopling all devices #}
 {% if device_ip.interface.device.name == device.name %}{# i-004: matching proper device #}
-{% if device.platform.slug == 'cumulus-linux' %}{# i-005: adding Cumulus specific stuff #}
+{% if device.platform.slug == 'cumulus-linux' %}{# i-005: adding vendor-specific stuff #}
   option cumulus-provision-url "http://{% for d_in in get_devices.json.results %}{% if d_in.site.slug == 'bln' and 'infra-srv' in d_in.name %}{{ d_in.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %}/cumulus-ztp.sh";
-{% endif %}{# i-005: adding Cumulus specific stuff #}
+{% elif device.platform.slug == 'arista-eos' %}{# i-005: adding vendor-specific stuff #}
+  option bootfile-name "http://{% for d_in in get_devices.json.results %}{% if d_in.site.slug == 'bln' and 'infra-srv' in d_in.name %}{{ d_in.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %}/bootstrap";
+{% endif %}{# i-005: adding vendor-specific stuff #}
 {% endif %}{# i-004: matching proper device #}
 {% endfor %}{# f-006: loopling all devices #}
 }

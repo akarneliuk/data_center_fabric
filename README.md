@@ -5,12 +5,22 @@ This project is a sister of another my project `Service Provider Fabric`. At som
 # Currently used network operation systems
 1. Arist EOS 4.21.1.1F
 2. Cisco IOS XR 6.5.1
-3. Nokia SR OS 16.0.R5
-4. Cumulus Linux 3.7.3
+3. Nokia SR OS 16.0.R7
+4. Cumulus Linux 3.7.6
+
+# Zero Touch Provisioning (ZTP)
+There is a full infrastructure enablers' stack (DHCP, DNS, FTP and HTTP) is deployed as Docker containers. Once the stack is launched after NetBox is up and running the following is happening:
+- Container with DHCP is launched and `dhcpd.conf` is automaically populated with entries from NetBox for OOB management subnet. In case there are IP/MAC pairs present in the device configuration, the static entries are created as well. For `Cumulus` and `Arista` there are corresponding entries added with link to ZTP script.
+- Container with DNS is launched and `named.conf` is automaically populated with zone names from NetBox for OOB management subnet. The files for forward and reverse (both IPv4 and IPv6) zones are automatically created and filled in with the entries of IPv4/IPv6 addresses of OOB interfaces matched to the hostnames.
+- Container with FTP server is launched and automatically populated with content, what must be shared (currently, only test file).
+- Container with HTTP server is launched and ZTP scripts are automatically generated based on the information from NetBox.
+
+# Docker containers
+In the folder `containers` you can find source files of the infrastructure Docker containers build on top of `Alpine Linux` to reduce usage of disk space.
 
 # Version
 
-The current version of this repository is `0.3.2`.
+The current version of this repository is `0.3.3`.
 
 # Prerequisites
 
@@ -48,3 +58,7 @@ Version `0.3.2`.
 4. The DNS forward zone is automatically filled with info from NetBox over REST API using Ansible.
 5. The DNS reverse zone for IPv4 is automatically filled with info from NetBox over REST API using Ansible.
 6. The DNS reverse zone for IPv6 is automatically filled with info from NetBox over REST API using Ansible.
+
+Version `0.3.3`.
+1. ZTP for Arista is added (script to be filled in).
+2. Some text updates.
