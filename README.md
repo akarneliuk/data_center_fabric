@@ -20,7 +20,7 @@ In the folder `containers` you can find source files of the infrastructure Docke
 
 ## Version
 
-The current version of this repository is `0.3.3`.
+The current version of this repository is `0.3.4`.
 
 ## Prerequisites
 
@@ -60,6 +60,9 @@ Version `0.3.2`.
 6. The DNS reverse zone for IPv6 is automatically filled with info from NetBox over REST API using Ansible.
 
 Version `0.3.3`.
-1. ZTP for Arista is added (script to be filled in).
+1. ZTP for Arista is added.
 2. Some text updates.
 3. Updated management topology with the Docker cloud on the management host.
+
+Version `0.3.4`.
+1. Some minor templates' and tasks' updates.

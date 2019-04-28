@@ -1,0 +1,18 @@
+!
+switchport default mode access
+!
+ip name-server {% for device in get_devices.json.results %}{% if device.site.slug == 'bln' and 'infra-srv' in device.name %}{{ device.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %}
+
+ip domain-name {{ domain_name }}
+!
+logging console debugging
+!
+username {{ arista.user }} privilege 15 secret {{ arista.pass }}
+!
+interface Management1
+   ip address dhcp
+!
+management api netconf
+   transport ssh def
+!
+end
