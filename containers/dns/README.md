@@ -9,6 +9,6 @@ To run the DNS server for the Data Center Fabric as Docekr container use:
 ```
 sudo docker container run -d -p {{ NATTED_IP }}:53:53 -p {{ NATTED_IP }}:53:53/udp \
     -v $PWD/data/named.conf:/etc/bind/named.conf:ro \
-    -v $PWD/data/zones:/var/bind/zones \ 
+    -v $PWD/data/zones:/var/bind/zones \
     --name dcf_dns akarneliuk/dcf_dns
 ```
