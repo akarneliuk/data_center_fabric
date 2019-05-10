@@ -1,8 +1,8 @@
 ---
 ansible_user: aaa
-ansible_pass: N3tw0rk!
-ansible_ssh_pass: N3tw0rk!
-ansible_become_pass: N3tw0rk!
+ansible_pass: L@bd0g!!
+ansible_ssh_pass: L@bd0g!!
+ansible_become_pass: L@bd0g!!
 
 # Integration with NetBox
 netbox_token: 0123456789abcdef0123456789abcdef01234567

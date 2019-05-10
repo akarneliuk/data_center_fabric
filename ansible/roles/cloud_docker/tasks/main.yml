@@ -33,9 +33,18 @@
 - name: INSTALLING PIP PACKAGE FOR DOCKER
   pip:
       name: "{{ item }}"
+      extra_args: --ignore-installed
   become: yes
   loop:
       - docker
+  tags:
+      - docker_install
+
+- name: CREATING FOLDER FOR CUSTOMIZED DOCKER CONFIGURATION
+  file:
+      path: /etc/docker
+      state: directory
+  become: yes
   tags:
       - docker_install
 

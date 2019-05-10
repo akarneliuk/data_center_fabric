@@ -20,7 +20,7 @@ In the folder `containers` you can find source files of the infrastructure Docke
 
 ## Version
 
-The current version of this repository is `0.3.4`.
+The current version of this repository is `0.3.5`.
 
 ## Prerequisites
 
@@ -66,3 +66,6 @@ Version `0.3.3`.
 
 Version `0.3.4`.
 1. Some minor templates' and tasks' updates.
+
+Version `0.3.5`.
+1. Fixed some problem with Docker installation for role `cloud_docker` caused by imporper `pip` behavior and missing folder.
