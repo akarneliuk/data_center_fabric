@@ -21,4 +21,11 @@ cisco:
 arista:
     user: aaa
     pass: aaa
+
+# SNMP credentials for all devices
+all_snmp:
+    user: Collector
+    pass:
+        auth: SUPER_AUTH
+        encr: SUPER_PASS
 ...

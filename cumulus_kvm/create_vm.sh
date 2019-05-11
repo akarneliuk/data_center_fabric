@@ -151,6 +151,4 @@ sudo virt-install \
 
 echo 'UPDATING IPTABLES...'
 
-iptables -I INPUT 1 -p tcp --dport 179 -j ACCEPT
 iptables -I FORWARD 1 -p tcp --dport 179 -j ACCEPT
-iptables -I OUTPUT 1 -p tcp --dport 179 -j ACCEPT

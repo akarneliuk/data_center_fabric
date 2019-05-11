@@ -123,3 +123,8 @@ add bgp neighbor {{ peer_interface_ip.address.split('/') | first }} peer-group {
 {% endif %}{# i-006: creating BGP neighbors #}
 
 {% endfor %}{# f-002: looping all physical ports #}
+
+{# 3. SNMP configuration #}
+add snmp-server listening-address fc00:de:1:ffff:f::3 vrf mgmt
+add snmp-server viewname all-items included iso
+add snmp-server username Collector auth-sha SUPER_AUTH encrypt-aes SUPER_PASS view all-items
