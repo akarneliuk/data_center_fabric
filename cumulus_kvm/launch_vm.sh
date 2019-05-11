@@ -48,3 +48,9 @@ sudo virsh start VX3
 sudo virsh start VX4
 sudo virsh start VX5
 sudo virsh start VX6
+
+echo 'UPDATING IPTABLES...'
+
+iptables -I INPUT 1 -p tcp --dport 179 -j ACCEPT
+iptables -I FORWARD 1 -p tcp --dport 179 -j ACCEPT
+iptables -I OUTPUT 1 -p tcp --dport 179 -j ACCEPT

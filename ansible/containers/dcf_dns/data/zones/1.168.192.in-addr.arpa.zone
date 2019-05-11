@@ -1,0 +1,19 @@
+$TTL 86400
+
+@ IN SOA de-bln-infra-srv.de.karnet.com.	root.de.karnet.com. (
+  100
+  3600
+  900
+  604800
+  86400
+)
+; NS entries
+        IN      NS      de-bln-infra-srv.de.karnet.com.
+; PTR entries
+1	IN	PTR	de-bln-infra-srv.de.karnet.com. 
+21	IN	PTR	de-bln-leaf-111.de.karnet.com. 
+22	IN	PTR	de-bln-leaf-112.de.karnet.com. 
+23	IN	PTR	de-bln-leaf-211.de.karnet.com. 
+24	IN	PTR	de-bln-leaf-212.de.karnet.com. 
+25	IN	PTR	de-bln-spine-101.de.karnet.com. 
+26	IN	PTR	de-bln-spine-201.de.karnet.com. 

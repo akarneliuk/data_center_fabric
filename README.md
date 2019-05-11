@@ -20,7 +20,7 @@ In the folder `containers` you can find source files of the infrastructure Docke
 
 ## Version
 
-The current version of this repository is `0.3.5`.
+The current version of this repository is `0.3.6`.
 
 ## Prerequisites
 
@@ -69,3 +69,6 @@ Version `0.3.4`.
 
 Version `0.3.5`.
 1. Fixed some problem with Docker installation for role `cloud_docker` caused by imporper `pip` behavior and missing folder.
+
+Version `0.3.6`.
+1. In the `containers` folder added information about Telegraf, InfluxDB and Grafana.
