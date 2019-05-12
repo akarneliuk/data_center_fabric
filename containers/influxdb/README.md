@@ -26,5 +26,7 @@ To create self-signed SSL sertificate: `sudo docker exec -it mon_influxdb openss
 # Basic management of the InfluxDB over REST API
 
 1. Test the reachability of the InfluxDB service: `curl -i http://localhost:8086/ping`.
-2. Create the database: `curl -X POST http://localhost:8086/query --data-urlencode "q=CREATE DATABASE spf"`.
-3. Create the user: `curl -X POST http://localhost:8086/query --data-urlencode "q=CREATE USER spf_workforce WITH PASSWORD 'spf_w0rkf0rc3' WITH ALL PRIVILEGES"`.
+2. Create the database for metrics: `curl -X POST http://localhost:8086/query --data-urlencode "q=CREATE DATABASE spf"`.
+3. Create the database for syslog: `curl -X POST http://localhost:8086/query --data-urlencode "q=CREATE DATABASE logs"`.
+4. Create the user: `curl -X POST http://localhost:8086/query --data-urlencode "q=CREATE USER spf_workforce WITH PASSWORD 'spf_w0rkf0rc3' WITH ALL PRIVILEGES"`.
+5. Check the database using authentication and HTTPS `curl -G 'https://localhost:8086/query?db=spf&pretty=true&u=spf_workforce&p=spf_w0rkf0rc3' --data-urlencode "q=SELECT * FROM interfaceX" --insecure`

@@ -72,3 +72,4 @@ Version `0.3.5`.
 
 Version `0.3.6`.
 1. In the `containers` folder added information about Telegraf, InfluxDB and Grafana.
+2. There are two containers with Telegraf `telegraf_SNMP` and `telegraf_syslog` as they collect different information.

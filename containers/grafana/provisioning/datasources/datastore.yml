@@ -1,0 +1,26 @@
+---
+apiVersion: 1
+datasources:
+    - name: SNMP
+      type: influxdb
+      access: proxy
+      database: spf
+      user: spf_workforce
+      password: spf_w0rkf0rc3
+      url: https://[fc00:de:1:fffe::2]:8086
+      withCredentials: yes
+      isDefault: yes
+      jsonData:
+          tlsSkipVerify: yes
+    - name: SYSLOG
+      type: influxdb
+      access: proxy
+      database: spf
+      user: spf_workforce
+      password: spf_w0rkf0rc3
+      url: https://[fc00:de:1:fffe::2]:8086
+      withCredentials: yes
+      isDefault: no
+      jsonData:
+          tlsSkipVerify: yes
+...

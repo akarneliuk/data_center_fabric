@@ -52,6 +52,7 @@ sudo virt-install \
   --disk path=/var/lib/libvirt/images/VX1.qcow2,bus=ide,size=4 \
   --import \
   --graphics vnc \
+  --noautoconsole  \
   --serial tcp,host=0.0.0.0:2261,mode=bind,protocol=telnet \
   --network=bridge:br0,mac=52:54:00:06:01:00,model=virtio \
   --network=bridge:br1112,mac=52:54:00:06:01:01,model=virtio \
@@ -70,6 +71,7 @@ sudo virt-install \
   --disk path=/var/lib/libvirt/images/VX2.qcow2,bus=ide,size=4 \
   --import \
   --graphics vnc \
+  --noautoconsole  \
   --serial tcp,host=0.0.0.0:2262,mode=bind,protocol=telnet \
   --network=bridge:br0,mac=52:54:00:06:02:00,model=virtio \
   --network=bridge:br1112,mac=52:54:00:06:02:01,model=virtio \
@@ -88,6 +90,7 @@ sudo virt-install \
   --disk path=/var/lib/libvirt/images/VX3.qcow2,bus=ide,size=4 \
   --import \
   --graphics vnc \
+  --noautoconsole  \
   --serial tcp,host=0.0.0.0:2263,mode=bind,protocol=telnet \
   --network=bridge:br0,mac=52:54:00:06:03:00,model=virtio \
   --network=bridge:br1314,mac=52:54:00:06:03:01,model=virtio \
@@ -106,6 +109,7 @@ sudo virt-install \
   --disk path=/var/lib/libvirt/images/VX4.qcow2,bus=ide,size=4 \
   --import \
   --graphics vnc \
+  --noautoconsole  \
   --serial tcp,host=0.0.0.0:2264,mode=bind,protocol=telnet \
   --network=bridge:br0,mac=52:54:00:06:04:00,model=virtio \
   --network=bridge:br1314,mac=52:54:00:06:04:01,model=virtio \
@@ -124,6 +128,7 @@ sudo virt-install \
   --disk path=/var/lib/libvirt/images/VX5.qcow2,bus=ide,size=4 \
   --import \
   --graphics vnc \
+  --noautoconsole  \
   --serial tcp,host=0.0.0.0:2265,mode=bind,protocol=telnet \
   --network=bridge:br0,mac=52:54:00:06:05:00,model=virtio \
   --network=bridge:br1115,mac=52:54:00:06:05:01,model=virtio \
@@ -142,6 +147,7 @@ sudo virt-install \
   --disk path=/var/lib/libvirt/images/VX6.qcow2,bus=ide,size=4 \
   --import \
   --graphics vnc \
+  --noautoconsole  \
   --serial tcp,host=0.0.0.0:2266,mode=bind,protocol=telnet \
   --network=bridge:br0,mac=52:54:00:06:06:00,model=virtio \
   --network=bridge:br1116,mac=52:54:00:06:06:01,model=virtio \
@@ -151,4 +157,4 @@ sudo virt-install \
 
 echo 'UPDATING IPTABLES...'
 
-iptables -I FORWARD 1 -p tcp --dport 179 -j ACCEPT
+sudo iptables -I FORWARD 1 -p tcp --dport 179 -j ACCEPT

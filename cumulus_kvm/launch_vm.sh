@@ -51,4 +51,4 @@ sudo virsh start VX6
 
 echo 'UPDATING IPTABLES...'
 
-iptables -I FORWARD 1 -p tcp --dport 179 -j ACCEPT
+sudo iptables -I FORWARD 1 -p tcp --dport 179 -j ACCEPT
