@@ -26,9 +26,21 @@
       - infra_enabler_install
       - infra_enabler_ops
 
+- name: CREATING USER-DEFINED DOCKER NETWORK
+  shell: "docker network create {{ docker.private_network.name }} {% if docker.private_network.ipv6 %}--ipv6{% endif %} {% if docker.private_network.subnet is defined %}--subnet {{ docker.private_network.subnet }}{% endif %} {% if docker.private_network.gateway is defined %}--gateway {{ docker.private_network.gateway }}{% endif %}"
+  ignore_errors: yes
+  become: yes
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+
 - name: BUILDING CONTAINERS ...
   include_tasks: "container_{{ container_item }}.yml"
   loop:
+      - dcf_influxdb
+      - dcf_telegraf_syslog
+      - dcf_telegraf_snmp
+      - dcf_grafana
       - dcf_dhcp
       - dcf_dns
       - dcf_ftp

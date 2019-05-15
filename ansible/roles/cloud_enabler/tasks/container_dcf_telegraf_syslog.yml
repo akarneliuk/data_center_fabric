@@ -1,0 +1,49 @@
+---
+- name: CONTAINER TELEGRAF // IMPORTING HOSTS VARIABLES
+  include_vars:
+      file: etc_hosts.yml
+  tags:
+      - tick_install
+      - tick_ops
+
+- name: CONTAINER TELEGRAF // CREATING FOLDER 
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}"
+      state: directory
+  tags:
+      - tick_install
+
+- name: CONTAINER TELEGRAF // GETTING IP OF INFLUXDB
+  docker_container:
+      name: dcf_influxdb
+  become: yes
+  register: dcf_influxdb_inspect
+  tags:
+      - tick_install
+
+- name: CONTAINER TELEGRAF // TEMPLATING TELEGRAF CONFIG
+  template:
+      src: "{{ container_item }}_template.j2"
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/telegraf.conf"
+  tags:
+      - tick_install
+
+- name: CONTAINER TELEGRAF // LAUNCHING CONTAINER
+  docker_container:
+      name: dcf_telegraf_syslog
+      image: telegraf
+      state: started
+      command: "-config /etc/telegraf/telegraf.conf"
+      networks:
+          - name: "{{ docker_private_network.name }}"
+      purge_networks: yes
+      ports:
+          - "514:514/udp"
+      volumes:
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/telegraf.conf:/etc/telegraf/telegraf.conf:ro"
+      etc_hosts: "{{ etc_hosts }}"
+  become: yes
+  tags:
+      - tick_install
+      - tick_ops
+...

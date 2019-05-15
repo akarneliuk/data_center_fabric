@@ -1,0 +1,42 @@
+---
+- name: CONTAINER TELEGRAF // CREATING FOLDER 
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}"
+      state: directory
+  tags:
+      - tick_install
+
+- name: CONTAINER TELEGRAF // GETTING IP OF INFLUXDB
+  docker_container:
+      name: dcf_influxdb
+  become: yes
+  register: dcf_influxdb_inspect
+  tags:
+      - tick_install
+
+- name: CONTAINER TELEGRAF // TEMPLATING TELEGRAF CONFIG
+  template:
+      src: "{{ container_item }}_template.j2"
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/telegraf.conf"
+  tags:
+      - tick_install
+
+- name: CONTAINER TELEGRAF // LAUNCHING CONTAINER
+  docker_container:
+      name: dcf_telegraf_snmp
+      image: telegraf
+      state: started
+      command: "-config /etc/telegraf/telegraf.conf"
+      networks:
+          - name: "{{ docker.private_network.name }}"
+      purge_networks: yes
+      ports:
+          - "161:161/udp"
+      volumes:
+           - "{{ pwd_actual }}/files/mibs:/usr/share/snmp/mibs"
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/telegraf.conf:/etc/telegraf/telegraf.conf:ro"
+  become: yes
+  tags:
+      - tick_install
+      - tick_ops
+...

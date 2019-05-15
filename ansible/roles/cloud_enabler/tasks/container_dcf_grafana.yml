@@ -1,0 +1,145 @@
+---
+- name: CONTAINER GRAFANA // CREATING FOLDER 
+  file:
+      dest: "{{ docker.path_to_containers }}/grafana"
+      state: directory
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // CREATING STORAGE FOLDER
+  file:
+      dest: "{{ docker.path_to_containers }}/grafana/data"
+      state: directory
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // GETTING IP OF INFLUXDB
+  docker_container:
+      name: dcf_influxdb
+  become: yes
+  register: dcf_influxdb_inspect
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // LAUNCHING CONTAINER
+  docker_container:
+      name: dcf_grafana
+      image: grafana/grafana
+      state: started
+      user: root
+      networks:
+          - name: "{{ docker_private_network.name }}"
+      purge_networks: yes
+      ports:
+           - "3000:3000"
+      volumes:
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/grafana/data:/var/lib/grafana"
+  become: yes
+  tags:
+      - tick_install
+      - tick_ops
+
+- name: CONTAINER GRAFANA // CREATE DATASTORE CONFIG FOR PROVISIONING
+  file:
+      dest: "{{ docker.path_to_containers }}/grafana/datastore.yml"
+      state: touch
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // TEMPLATING DATASTORES
+  copy:
+      content: |
+          apiVersion: 1
+          datasources:
+              - name: InfluxDB-SNMP
+                type: influxdb
+                access: proxy
+                database: {{ var_influxdb.db_name.snmp }} 
+                user: {{ var_influxdb.username }}
+                password: {{ var_influxdb.password }}
+                url: https://{{ dcf_influxdb_inspect.ansible_facts.docker_container.NetworkSettings.Networks.mon_net.IPAddress }}:8086
+                withCredentials: yes
+                isDefault: yes
+                jsonData:
+                    tlsSkipVerify: yes
+              - name: InfluxDB-SYSLOG
+                type: influxdb
+                access: proxy
+                database: {{ var_influxdb.db_name.syslog }}
+                user: {{ var_influxdb.username }}
+                password: {{ var_influxdb.password }}
+                url: https://{{ dcf_influxdb_inspect.ansible_facts.docker_container.NetworkSettings.Networks.mon_net.IPAddress }}:8086
+                withCredentials: yes
+                isDefault: no
+                jsonData:
+                    tlsSkipVerify: yes
+      dest: "{{ docker.path_to_containers }}/grafana/datastore.yml"
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // COPYING DATASTORY IN CONTAINER FOR PROVISIONING
+  shell: "docker cp {{ docker.path_to_containers }}/grafana/datastore.yml dcf_grafana:/etc/grafana/provisioning/datasources/datastore.yml"
+  become: yes
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // GENERATING SSL CERTIFICATE
+  shell: 'docker exec -i dcf_grafana openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/grafana-selfsigned.key -out /etc/ssl/grafana-selfsigned.crt -days 365 -subj "/C=DE/ST=NRW/L=DUS/O=karneliuk.com/CN=grafana.karneliuk.com"'
+  become: yes
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // COPYING INITIAL CONFIGURATION FILE FROM GRAFANA
+  shell: "docker cp dcf_grafana:/etc/grafana/grafana.ini {{ docker.path_to_containers }}/grafana/grafana.ini"
+  become: yes
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // ENABLING HTTPS
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/grafana/grafana.ini"
+      regexp: ';protocol ='
+      line: 'protocol = https'
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // PROVIDING CERTIFICATE PATH
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/grafana/grafana.ini"
+      regexp: '# https certs & key file'
+      line: 'cert_file = /etc/ssl/grafana-selfsigned.crt'
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // PROVIDING KEY PATH
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/grafana/grafana.ini"
+      regexp: ';cert_key ='
+      line: 'cert_key = /etc/ssl/grafana-selfsigned.key'
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // COPYING INITIAL CONFIGURATION FILE FROM GRAFANA
+  shell: "docker cp {{ docker.path_to_containers }}/grafana/grafana.ini dcf_grafana:/etc/grafana/grafana.ini"
+  become: yes
+  tags:
+      - tick_install
+
+- name: CONTAINER GRAFANA // RESTARTING CONTAINER
+  docker_container:
+      name: dcf_grafana
+      image: grafana/grafana
+      state: started
+      user: root
+      restart: yes
+      networks:
+          - name: "{{ docker_private_network.name }}"
+      purge_networks: yes
+      ports:
+           - "3000:3000"
+      volumes:
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/grafana/data:/var/lib/grafana"
+  become: yes
+  tags:
+      - tick_install
+...

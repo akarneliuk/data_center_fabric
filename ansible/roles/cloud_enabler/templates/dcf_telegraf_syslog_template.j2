@@ -1,5 +1,7 @@
 # Telegraf Configuration
 #
+
+# Global tags can be specified here in key="value" format.
 [global_tags]
   # dc = "us-east-1" # will tag all metrics with dc=us-east-1
   # rack = "1a"
@@ -73,23 +75,15 @@
   ##
   ## Multiple URLs can be specified for a single cluster, only ONE of the
   ## urls will be written to each interval.
-  # urls = ["unix:///var/run/influxdb.sock"]
-  # urls = ["udp://127.0.0.1:8089"]
-  # urls = ["https://172.19.0.2:8086"]
-  urls = ["https://[fc00:de:1:fffe::2]:8086"]
+  urls = ["https://{{ dcf_influxdb_inspect.ansible_facts.docker_container.NetworkSettings.Networks.mon_net.IPAddress }}:8086"]
 
   ## The target database for metrics; will be created as needed.
-  ## For UDP url endpoint database needs to be configured on server side.
-  database = "logs"
-
-  ## The value of this tag will be used to determine the database.  If this
-  ## tag is not set the 'database' option is used as the default.
-  # database_tag = ""
+  database = "{{ var_influxdb.db_name.syslog }}"
 
   ## If true, no CREATE DATABASE queries will be sent.  Set to true when using
   ## Telegraf with a user without permissions to create databases or when the
   ## database already exists.
-  skip_database_creation = false
+  skip_database_creation = true
 
   ## Name of existing retention policy to write to.  Empty string writes to
   ## the default retention policy.  Only takes effect when using HTTP.
@@ -100,11 +94,11 @@
   # write_consistency = "any"
 
   ## Timeout for HTTP messages.
-  # timeout = "5s"
+  timeout = "5s"
 
   ## HTTP Basic Auth
-  username = "spf_workforce"
-  password = "spf_w0rkf0rc3"
+  username = "{{ var_influxdb.username }}"
+  password = "{{ var_influxdb.password }}"
 
   ## HTTP User-Agent
   # user_agent = "telegraf"
@@ -136,18 +130,6 @@
   ## existing data has been written.
   # influx_uint_support = false
 
-
-###############################################################################
-#                            PROCESSOR PLUGINS                                #
-###############################################################################
-
-###############################################################################
-#                            AGGREGATOR PLUGINS                               #
-###############################################################################
-
-###############################################################################
-#                            INPUT PLUGINS                                    #
-###############################################################################
 
 ###############################################################################
 #                            SERVICE INPUT PLUGINS                            #
@@ -201,30 +183,3 @@
   ## For each combination a field is created.
   ## Its name is created concatenating identifier, sdparam_separator, and parameter name.
   # sdparam_separator = "_"
-
-
-# # Stream a log file, like the tail -f command
-# [[inputs.tail]]
-#   ## files to tail.
-#   ## These accept standard unix glob matching rules, but with the addition of
-#   ## ** as a "super asterisk". ie:
-#   ##   "/var/log/**.log"  -> recursively find all .log files in /var/log
-#   ##   "/var/log/*/*.log" -> find all .log files with a parent dir in /var/log
-#   ##   "/var/log/apache.log" -> just tail the apache log file
-#   ##
-#   ## See https://github.com/gobwas/glob for more examples
-#   ##
-#   files = ["/var/mymetrics.out"]
-#   ## Read file from beginning.
-#   from_beginning = false
-#   ## Whether file is a named pipe
-#   pipe = false
-#
-#   ## Method used to watch for file updates.  Can be either "inotify" or "poll".
-#   # watch_method = "inotify"
-#
-#   ## Data format to consume.
-#   ## Each data format has its own unique set of configuration options, read
-#   ## more about them here:
-#   ## https://github.com/influxdata/telegraf/blob/master/docs/DATA_FORMATS_INPUT.md
-#   data_format = "influx"

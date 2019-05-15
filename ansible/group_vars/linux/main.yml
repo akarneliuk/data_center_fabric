@@ -16,7 +16,33 @@ bgp:
 docker:
     path_to_containers: containers
     repo: akarneliuk
+    private_network: 
+        name: mon_net
+        ipv6: true
+        subnet: fc00:de:1:fffe::/64
+        gateway: fc00:de:1:fffe::1
 
 # Domain name (perhaps, should be moved to NetBox)
 domain_name: de.karnet.com
+
+# InfluxData TICK
+var_influxdb:
+    username: dcf_workforce
+    password: dcf_w0rkf0rc3
+    db_name: 
+        snmp: dcf_snmp
+        syslog: dcf_syslog
+var_grafana:
+var_telegraf:
+
+# SNMP parameters
+snmp_credentials:
+    username: Collector
+    level: authPriv
+    auth:
+        type: SHA
+        pass: SUPER_AUTH
+    priv:
+        type: AES
+        pass: SUPER_PASS
 ...
