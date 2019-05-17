@@ -66,6 +66,11 @@
            - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/nginx.conf:/etc/nginx/nginx.conf:ro"
            - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/default.conf:/etc/nginx/conf.d/default.conf:ro"
            - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/website:/var/www/html/website"
+      log_driver: syslog
+      log_options:
+          syslog-address: udp://localhost:514
+          syslog-format: rfc5424
+          tag: "{{ container_item }}"
   become: yes
   tags:
       - infra_enabler_install

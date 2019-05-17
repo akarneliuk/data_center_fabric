@@ -59,6 +59,11 @@
       volumes:
            - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/named.conf:/etc/bind/named.conf:ro"
            - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/zones:/var/bind/zones"
+      log_driver: syslog
+      log_options:
+          syslog-address: udp://localhost:514
+          syslog-format: rfc5424
+          tag: "{{ container_item }}"
   become: yes
   tags:
       - infra_enabler_install

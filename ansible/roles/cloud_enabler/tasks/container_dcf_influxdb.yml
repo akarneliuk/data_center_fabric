@@ -1,25 +1,25 @@
 ---
-- name: CONTAINER INFLUXDB // CREATING FOLDER 
+- name: CONTAINER WITH {{ container_item }} // CREATING FOLDER 
   file:
       dest: "{{ docker.path_to_containers }}/influxdb"
       state: directory
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // CREATING STORAGE FOLDER
+- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOLDER
   file:
       dest: "{{ docker.path_to_containers }}/influxdb/data"
       state: directory
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // GENERATING INFLUXDB CONFIG
+- name: CONTAINER WITH {{ container_item }} // GENERATING INFLUXDB CONFIG
   shell: "docker run --rm influxdb influxd config > {{ docker.path_to_containers }}/influxdb/influxdb.conf"
   become: yes
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // LAUNCHING CONTAINER
+- name: CONTAINER WITH {{ container_item }} // LAUNCHING CONTAINER
   docker_container:
       name: dcf_influxdb
       image: influxdb
@@ -33,19 +33,24 @@
       volumes:
           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro"
           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/influxdb/data:/var/lib/influxdb"
+      log_driver: syslog
+      log_options:
+          syslog-address: udp://localhost:514
+          syslog-format: rfc5424
+          tag: "{{ container_item }}"
   become: yes
   tags:
-      - tick_install
-      - tick_ops
+      - infra_enabler_install
+      - infra_enabler_ops
 
-- name: CONTAINER INFLUXDB // WAITING CONTAINER TO BOOT
+- name: CONTAINER WITH {{ container_item }} // WAITING CONTAINER TO BOOT
   pause:
       seconds: 15
   tags:
-      - tick_install
-      - tick_ops
+      - infra_enabler_install
+      - infra_enabler_ops
 
-- name: CONTAINER INFLUXDB // CREATING DATABASE FOR SNMP
+- name: CONTAINER WITH {{ container_item }} // CREATING DATABASE FOR SNMP
   uri:
       url: "http://localhost:8086/query?q={{ db_request | urlencode }}"
       method: POST
@@ -53,9 +58,9 @@
   vars:
       db_request: "CREATE DATABASE {{ var_influxdb.db_name.snmp }}"
   tags:
-      - tick_install
+      - infra_enabler_install
  
-- name: CONTAINER INFLUXDB // CREATING DATABASE FOR SYSLOG
+- name: CONTAINER WITH {{ container_item }} // CREATING DATABASE FOR SYSLOG
   uri:
       url: "http://localhost:8086/query?q={{ db_request | urlencode }}"
       method: POST
@@ -63,9 +68,9 @@
   vars:
       db_request: "CREATE DATABASE {{ var_influxdb.db_name.syslog }}"
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // CREATING USERS
+- name: CONTAINER WITH {{ container_item }} // CREATING USERS
   uri:
       url: "http://localhost:8086/query?q={{ db_request | urlencode }}"
       method: POST
@@ -73,47 +78,47 @@
   vars:
       db_request: "CREATE USER {{ var_influxdb.username }} WITH PASSWORD '{{ var_influxdb.password }}' WITH ALL PRIVILEGES"
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // GENERATING SSL CERTIFICATE
+- name: CONTAINER WITH {{ container_item }} // GENERATING SSL CERTIFICATE
   shell: 'docker exec -i dcf_influxdb openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/influxdb-selfsigned.key -out /etc/ssl/influxdb-selfsigned.crt -days 365 -subj "/C=DE/ST=NRW/L=DUS/O=karneliuk.com/CN=influxdb.karneliuk.com"'
   become: yes
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // ENABLING AUTHENTICATION
+- name: CONTAINER WITH {{ container_item }} // ENABLING AUTHENTICATION
   lineinfile:
       dest: "{{ docker.path_to_containers }}/influxdb/influxdb.conf"
       regexp: 'auth-enabled = false'
       line: 'auth-enabled = true'
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // ENABLING HTTPS
+- name: CONTAINER WITH {{ container_item }} // ENABLING HTTPS
   lineinfile:
       dest: "{{ docker.path_to_containers }}/influxdb/influxdb.conf"
       regexp: 'https-enabled = false'
       line: 'https-enabled = true'
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // PROVIDING CERTIFICATE PATH
+- name: CONTAINER WITH {{ container_item }} // PROVIDING CERTIFICATE PATH
   lineinfile:
       dest: "{{ docker.path_to_containers }}/influxdb/influxdb.conf"
       regexp: 'https-certificate = "/etc/ssl/influxdb.pem"'
       line: 'https-certificate = "/etc/ssl/influxdb-selfsigned.crt"'
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // PROVIDING KEY PATH
+- name: CONTAINER WITH {{ container_item }} // PROVIDING KEY PATH
   lineinfile:
       dest: "{{ docker.path_to_containers }}/influxdb/influxdb.conf"
       regexp: 'https-private-key = ""'
       line: 'https-private-key = "/etc/ssl/influxdb-selfsigned.key"'
   tags:
-      - tick_install
+      - infra_enabler_install
 
-- name: CONTAINER INFLUXDB // RESTARTING CONTAINER
+- name: CONTAINER WITH {{ container_item }} // RESTARTING CONTAINER
   docker_container:
       name: dcf_influxdb
       image: influxdb
@@ -128,7 +133,12 @@
       volumes:
            - "{{ pwd_actual }}/{{ docker.path_to_containers }}/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro"
            - "{{ pwd_actual }}/{{ docker.path_to_containers }}/influxdb/data:/var/lib/influxdb"
+      log_driver: syslog
+      log_options:
+          syslog-address: udp://localhost:514
+          syslog-format: rfc5424
+          tag: "{{ container_item }}"
   become: yes
   tags:
-      - tick_install
+      - infra_enabler_install
 ...
