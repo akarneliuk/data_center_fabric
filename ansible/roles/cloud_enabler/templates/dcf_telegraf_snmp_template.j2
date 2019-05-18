@@ -150,7 +150,7 @@
 
 # # Retrieves SNMP values from remote agents
 [[inputs.snmp]]
-   agents = [ {% for device in get_devices.json.results %}{% if loop.index0 > 0 %}, {% endif %}"{{ device.primary_ip4.address | ipaddr('address') }}:161"{% endfor %} ]
+   agents = [ {% for device in get_devices.json.results %}{% if loop.index0 > 0 %}, {% endif %}"[{{ device.primary_ip6.address | ipaddr('address') }}]:161"{% endfor %} ]
 #   ## Timeout for each SNMP query.
    timeout = "5s"
 #   ## Number of retries to attempt within timeout.

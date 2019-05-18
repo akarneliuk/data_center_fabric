@@ -20,7 +20,7 @@ In the folder `containers` you can find source files of the infrastructure Docke
 
 ## Version
 
-The current version of this repository is `0.3.7`.
+The current version of this repository is `0.3.8`.
 
 ## Prerequisites
 
@@ -75,5 +75,10 @@ Version `0.3.6`.
 2. There are two containers with Telegraf `telegraf_snmp` and `telegraf_syslog` as they collect different information.
 
 Version `0.3.7`.
-1. The role `cloud_enabler` is extended with monitoring capabilities based on Telegraf, InfluxDB and Grafana
+1. The role `cloud_enabler` is extended with monitoring capabilities based on Telegraf, InfluxDB and Grafana using approach from `Service Provider Fabric`.
 2. Information from data centre switches is collected using SNMP and Syslog, from Docker containers using Syslog.
+
+Version `0.3.8`.
+1. Configuration of SNMP on Cumulus is added to `dc_underlay` role. Arista/Cisco to add.
+2. SNMPv3 with authentication and encryption is collected over IPv6.
+3. Dashboards are added to `containers/grafana/dashboards` folder.

@@ -26,3 +26,5 @@ To generate self-signed SSL certificate:
 ```
 sudo docker exec -it mon_grafana openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/grafana-selfsigned.key -out /etc/ssl/grafana-selfsigned.crt -days 365 -subj "/C=DE/ST=NRW/L=DUS/O=karneliuk.com/CN=grafana.karneliuk.com"
 ```
+
+To add predefined dashbords copy from the folder `dashboards` proper dasboards and import them to Grafana.

@@ -44,4 +44,32 @@
   tags:
       - infra_enabler_install
       - infra_enabler_ops
+
+- name: CONTAINER WITH {{ container_item }} // ALLOWING FW RULES FOR SNMP OVER IPV6 // DST
+  iptables:
+      rule_num: 1
+      action: insert
+      ip_version: ipv6
+      chain: FORWARD
+      protocol: udp
+      destination_port: 161
+      jump: ACCEPT
+  become: yes
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+
+- name: CONTAINER WITH {{ container_item }} // ALLOWING FW RULES FOR SNMP OVER IPV6 // SRC
+  iptables:
+      rule_num: 1
+      action: insert
+      ip_version: ipv6
+      chain: FORWARD
+      protocol: udp
+      source_port: 161
+      jump: ACCEPT
+  become: yes
+  tags:
+      - infra_enabler_install
+      - infra_enabler_op
 ...
