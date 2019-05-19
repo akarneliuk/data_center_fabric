@@ -11,8 +11,8 @@ This part is dedicated for automated deployment of:
 - Run `ansible-playbook data_center_fabric.yml --inventory=inventory/hosts --tags=configure_underlay` to configure underlaying infrastructure of the Data Centre Fabric.
 - Run `ansible-playbook data_center_fabric.yml --inventory=inventory/hosts --tags=docker_install` to install Docker on your working station.
 - Run `ansible-playbook data_center_fabric.yml --inventory=inventory/hosts --tags=docker_ops` to run Docker once it's installed on your working station.
-- Run `ansible-playbook data_center_fabric.yml --inventory=inventory/hosts --tags=infra_enabler_install` to install as Docker containers and configure the following service: DHCP, DNS, FTP and HTTP.
-- Run `ansible-playbook data_center_fabric.yml --inventory=inventory/hosts --tags=infra_enabler_ops` to run DHCP, DNS, FTP and HTTP services once they are installed.
+- Run `ansible-playbook data_center_fabric.yml --inventory=inventory/hosts --tags=infra_enabler_install` to install as Docker containers and configure the following service: DHCP, DNS, FTP, HTTP, Telegraf for syslog, Telegraf for SNMP, InfluxDB and Grafana.
+- Run `ansible-playbook data_center_fabric.yml --inventory=inventory/hosts --tags=infra_enabler_ops` to run DHCP, DNS, FTP, HTTP, Telegraf for syslog, Telegraf for SNMP, InfluxDB and Grafana services once they are installed.
 
 ## Current limitation
 

@@ -82,3 +82,5 @@ Version `0.3.8`.
 1. Configuration of SNMP on Cumulus is added to `dc_underlay` role. Arista/Cisco to add.
 2. SNMPv3 with authentication and encryption is collected over IPv6.
 3. Dashboards are added to `containers/grafana/dashboards` folder.
+4. The role `dc_underlay` is updated so that for Cumulus Linux rsyslog/snmpd services are restarted.
+5. Syslog configuration is pushed to the Cumulus devices during provisioning of the `dc_underlay` role.

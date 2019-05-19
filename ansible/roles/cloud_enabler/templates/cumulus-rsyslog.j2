@@ -1,0 +1,1 @@
+action(type="omfwd" Target="{% for device in get_devices.json.results %}{% if device.site.slug == 'bln' and 'infra-srv' in device.name %}{{ device.primary_ip4.address | ipaddr('address') }}{% endif %}{% endfor %}" Template="RSYSLOG_SyslogProtocol23Format" Device="mgmt" Port="514" Protocol="udp")

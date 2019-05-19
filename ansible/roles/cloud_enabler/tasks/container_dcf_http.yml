@@ -48,6 +48,13 @@
   tags:
       - infra_enabler_install
 
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING CUMULUS SYSLOG
+  template:
+      src: cumulus-rsyslog.j2
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/website/cumulus-rsyslog.conf"
+  tags:
+      - infra_enabler_install
+
 - name: CONTAINER WITH {{ container_item }} // TEMPLATING ARISTA ZTP SCRIPT
   template:
       src: arista-ztp.j2
