@@ -84,3 +84,4 @@ Version `0.3.8`.
 3. Dashboards are added to `containers/grafana/dashboards` folder.
 4. The role `dc_underlay` is updated so that for Cumulus Linux rsyslog/snmpd services are restarted.
 5. Syslog configuration is pushed to the Cumulus devices during provisioning of the `dc_underlay` role.
+6. Management topology is updated with additional four containers.
