@@ -9,4 +9,5 @@ To launch the built lab use `./launch_vm.sh`.
 
 # Note
 
-As the lab is relying on the ZTP functionality, it's supposed you start the infrastructure stack (DHCP, DNS, FTP, HTTP) beforehand.
+1. As the lab is relying on the ZTP functionality, it's supposed you start the infrastructure stack (DHCP, DNS, FTP, HTTP) beforehand.
+2. The build script copies the default image to the default KVM folder `/var/lib/libvirt/images`. The path to the default image is `/tmp/cumulus-linux-3.7.5-vx-amd64-qemu.qcow2`.

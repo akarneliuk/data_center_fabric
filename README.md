@@ -85,3 +85,5 @@ Version `0.3.8`.
 4. The role `dc_underlay` is updated so that for Cumulus Linux rsyslog/snmpd services are restarted.
 5. Syslog configuration is pushed to the Cumulus devices during provisioning of the `dc_underlay` role.
 6. Management topology is updated with additional four containers.
+7. All the containers are moved to user-defined Docker bridge running both IPv4/IPv6.
+8. As a quick and dirty lab setup with 6x Cumulus VXs, there are two shell scripts in the `cumulus_kvm` folder. Refer there for more details.
