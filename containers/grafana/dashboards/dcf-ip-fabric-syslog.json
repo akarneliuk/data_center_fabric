@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 5,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -26,12 +26,12 @@
       "datasource": "InfluxDB-SYSLOG",
       "fill": 1,
       "gridPos": {
-        "h": 6,
+        "h": 5,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 2,
+      "id": 4,
       "legend": {
         "avg": false,
         "current": false,
@@ -91,26 +91,8 @@
           "tags": [
             {
               "key": "hostname",
-              "operator": "=",
-              "value": "de-bln-leaf-111"
-            },
-            {
-              "condition": "OR",
-              "key": "hostname",
-              "operator": "=",
-              "value": "de-bln-leaf-112"
-            },
-            {
-              "condition": "OR",
-              "key": "hostname",
-              "operator": "=",
-              "value": "de-bln-leaf-211"
-            },
-            {
-              "condition": "OR",
-              "key": "hostname",
-              "operator": "=",
-              "value": "de-bln-leaf-212"
+              "operator": "!=",
+              "value": "sand9.karneliuk.com"
             }
           ]
         }
@@ -119,7 +101,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "number of syslog messages",
+      "title": "syslog messages' rate",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -161,12 +143,12 @@
       "datasource": "InfluxDB-SYSLOG",
       "fontSize": "100%",
       "gridPos": {
-        "h": 12,
+        "h": 9,
         "w": 24,
         "x": 0,
-        "y": 6
+        "y": 5
       },
-      "id": 4,
+      "id": 2,
       "links": [],
       "pageSize": null,
       "scroll": true,
@@ -184,6 +166,22 @@
         },
         {
           "alias": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        },
+        {
+          "alias": "",
           "colorMode": "cell",
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -191,7 +189,7 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "decimals": 2,
-          "pattern": "/.*/",
+          "pattern": "severity_code",
           "thresholds": [
             "3.01",
             "5.01"
@@ -202,12 +200,19 @@
       ],
       "targets": [
         {
-          "groupBy": [],
+          "groupBy": [
+            {
+              "params": [
+                "hostname"
+              ],
+              "type": "tag"
+            }
+          ],
           "measurement": "syslog",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
-          "resultFormat": "time_series",
+          "resultFormat": "table",
           "select": [
             [
               {
@@ -229,37 +234,20 @@
           "tags": [
             {
               "key": "hostname",
-              "operator": "=",
-              "value": "de-bln-leaf-111"
-            },
-            {
-              "condition": "OR",
-              "key": "hostname",
-              "operator": "=",
-              "value": "de-bln-leaf-112"
-            },
-            {
-              "condition": "OR",
-              "key": "hostname",
-              "operator": "=",
-              "value": "de-bln-leaf-211"
-            },
-            {
-              "condition": "OR",
-              "key": "hostname",
-              "operator": "=",
-              "value": "de-bln-leaf-212"
+              "operator": "!=",
+              "value": "sand9.karneliuk.com"
             }
           ]
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Syslog messages",
-      "transform": "timeseries_to_columns",
+      "title": "syslog messages",
+      "transform": "table",
       "type": "table"
     }
   ],
+  "refresh": "10s",
   "schemaVersion": 18,
   "style": "dark",
   "tags": [],
@@ -296,7 +284,7 @@
     ]
   },
   "timezone": "",
-  "title": "dcf - ip fabric - syslog",
-  "uid": "sAfkmvZWz",
-  "version": 2
+  "title": "dcf-ip-fabric-syslog",
+  "uid": "LTWg9wWZk",
+  "version": 3
 }

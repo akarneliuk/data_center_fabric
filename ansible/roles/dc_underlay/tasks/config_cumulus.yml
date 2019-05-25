@@ -1,0 +1,92 @@
+---
+- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }}
+  nclu:
+      atomic: yes
+      template: "{{ lookup('template', '{{ device_item.platform.slug }}.j2') }}"
+  ignore_errors: yes
+  ignore_unreachable: yes
+  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
+  vars:
+      ansible_user: "{{ cumulus.user }}"
+      ansible_ssh_pass: "{{ cumulus.pass }}"
+  tags:
+      - configure_underlay
+
+- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }} // GETTING SYSLOG CONFIG
+  get_url:
+      url: http://192.168.1.1/cumulus-rsyslog.conf 
+      dest: /etc/rsyslog.d/11-remotesyslog.conf
+  become: yes
+  ignore_errors: yes
+  ignore_unreachable: yes
+  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
+  vars:
+      ansible_user: "{{ cumulus.user }}"
+      ansible_ssh_pass: "{{ cumulus.pass }}"
+      ansible_become_pass: "{{ cumulus.pass }}"
+  tags:
+      - configure_underlay
+
+- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }} // RESTARTING SYSLOG
+  service:
+      name: rsyslog
+      state: restarted
+  become: yes
+  ignore_errors: yes
+  ignore_unreachable: yes
+  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
+  vars:
+      ansible_user: "{{ cumulus.user }}"
+      ansible_ssh_pass: "{{ cumulus.pass }}"
+      ansible_become_pass: "{{ cumulus.pass }}"
+  tags:
+      - configure_underlay
+
+- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }} // RESTARTING SNMP
+  service:
+      name: snmpd
+      state: restarted
+  become: yes
+  ignore_errors: yes
+  ignore_unreachable: yes
+  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
+  vars:
+      ansible_user: "{{ cumulus.user }}"
+      ansible_ssh_pass: "{{ cumulus.pass }}"
+      ansible_become_pass: "{{ cumulus.pass }}"
+  tags:
+      - configure_underlay
+
+- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }} // STOPPING NTP
+  service:
+      name: ntp
+      state: stopped
+      enabled: no
+  become: yes
+  ignore_errors: yes
+  ignore_unreachable: yes
+  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
+  vars:
+      ansible_user: "{{ cumulus.user }}"
+      ansible_ssh_pass: "{{ cumulus.pass }}"
+      ansible_become_pass: "{{ cumulus.pass }}"
+  tags:
+      - configure_underlay
+
+- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }} // STARTING NTP IN VRF MGMT
+  service:
+      name: ntp@mgmt
+      state: started
+      enabled: yes
+  become: yes
+  ignore_errors: yes
+  ignore_unreachable: yes
+  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
+  vars:
+      ansible_user: "{{ cumulus.user }}"
+      ansible_ssh_pass: "{{ cumulus.pass }}"
+      ansible_become_pass: "{{ cumulus.pass }}"
+  tags:
+      - configure_underlay
+
+...

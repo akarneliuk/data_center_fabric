@@ -42,12 +42,12 @@ sudo ifconfig br1416 up
 
 echo 'COPYING VMs...'
 
-sudo cp /tmp/cumulus-linux-3.7.5-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX1.qcow2
-sudo cp /tmp/cumulus-linux-3.7.5-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX2.qcow2
-sudo cp /tmp/cumulus-linux-3.7.5-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX3.qcow2
-sudo cp /tmp/cumulus-linux-3.7.5-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX4.qcow2
-sudo cp /tmp/cumulus-linux-3.7.5-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX5.qcow2
-sudo cp /tmp/cumulus-linux-3.7.5-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX6.qcow2
+sudo cp /tmp/cumulus-linux-3.7.6-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX1.qcow2
+sudo cp /tmp/cumulus-linux-3.7.6-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX2.qcow2
+sudo cp /tmp/cumulus-linux-3.7.6-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX3.qcow2
+sudo cp /tmp/cumulus-linux-3.7.6-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX4.qcow2
+sudo cp /tmp/cumulus-linux-3.7.6-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX5.qcow2
+sudo cp /tmp/cumulus-linux-3.7.6-vx-amd64-qemu.qcow2 /var/lib/libvirt/images/VX6.qcow2
 
 echo 'CREATING VMs...'
 

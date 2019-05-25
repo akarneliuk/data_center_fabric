@@ -52,63 +52,7 @@
       - configure_underlay
 
 - name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }}
-  nclu:
-      atomic: yes
-      template: "{{ lookup('template', '{{ device_item.platform.slug }}.j2') }}"
-  ignore_errors: yes
-  ignore_unreachable: yes
-  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
-  vars:
-      ansible_user: "{{ cumulus.user }}"
-      ansible_ssh_pass: "{{ cumulus.pass }}"
-  when: device_item.platform.slug == 'cumulus-linux'
-  tags:
-      - configure_underlay
-
-- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }} // GETTING SYSLOG CONFIG
-  get_url:
-      url: http://192.168.1.1/cumulus-rsyslog.conf 
-      dest: /etc/rsyslog.d/11-remotesyslog.conf
-  become: yes
-  ignore_errors: yes
-  ignore_unreachable: yes
-  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
-  vars:
-      ansible_user: "{{ cumulus.user }}"
-      ansible_ssh_pass: "{{ cumulus.pass }}"
-      ansible_become_pass: "{{ cumulus.pass }}"
-  when: device_item.platform.slug == 'cumulus-linux'
-  tags:
-      - configure_underlay
-
-- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }} // RESTARTING SYSLOG
-  service:
-      name: rsyslog
-      state: restarted
-  become: yes
-  ignore_errors: yes
-  ignore_unreachable: yes
-  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
-  vars:
-      ansible_user: "{{ cumulus.user }}"
-      ansible_ssh_pass: "{{ cumulus.pass }}"
-      ansible_become_pass: "{{ cumulus.pass }}"
-  when: device_item.platform.slug == 'cumulus-linux'
-  tags:
-      - configure_underlay
-
-- name: CONFIGURATION LOOP // CUMULUS // CONFIGURING {{ device_item.name }} // RESTARTING SNMP
-  service:
-      name: snmpd
-      state: restarted
-  become: yes
-  ignore_errors: yes
-  ignore_unreachable: yes
-  delegate_to: "{{ device_item.primary_ip4.address | ipaddr('address') }}"
-  vars:
-      ansible_user: "{{ cumulus.user }}"
-      ansible_ssh_pass: "{{ cumulus.pass }}"
-      ansible_become_pass: "{{ cumulus.pass }}"
+  include_tasks: config_cumulus.yml
   when: device_item.platform.slug == 'cumulus-linux'
   tags:
       - configure_underlay
@@ -130,7 +74,7 @@
   tags:
       - configure_underlay
 
-- name: CONFIGURATION LOOP // ARISTA // CONFIGURING {{ device_item.name }}
+- name: CONFIGURATION LOOP // CISCO // CONFIGURING {{ device_item.name }}
   local_action:
       module: "iosxr_config"
       src: "{{ working_folder }}/{{ device_item.name }}/{{ device_item.name }}.conf"

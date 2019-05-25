@@ -15,7 +15,6 @@ To run the Telegraf to monitor the Data Center Fabric as Docekr container use:
 ```
 sudo docker run -d -p 6514:6514/udp \
       -v $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro \
-      --dns 172.20.0.4 \
       --network mon_net \
       --name mon_telegraf_syslog \
       telegraf -config /etc/telegraf/telegraf.conf
