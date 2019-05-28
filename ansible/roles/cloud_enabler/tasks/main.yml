@@ -41,6 +41,7 @@
       - dcf_telegraf_syslog
       - dcf_telegraf_snmp
       - dcf_grafana
+      - dcf_kapacitor
       - dcf_dhcp
       - dcf_dns
       - dcf_ftp

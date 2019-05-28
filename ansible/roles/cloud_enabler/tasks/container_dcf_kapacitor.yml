@@ -1,0 +1,281 @@
+---
+- name: CONTAINER WITH {{ container_item }} // COLLECTING INFLUXDB DATA
+  docker_container:
+      name: dcf_influxdb
+  become: yes
+  register: dcf_influxdb_inspect
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING FOLDER 
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING OVERALL STORAGE FOLDER
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOLDER FOR TICK SCRIPTS
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/scripts"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FORLDER FOR PERSITENT SUBSCRIPTION
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/var_lib_kapacitor"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOLDER FOR SHELL SCRIPTS
+  file:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/exec"
+      state: directory
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // COLLECTING HOSTNAME OF THE MGMT HOST
+  command: hostname
+  register: mgmt_host_hostname
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // GENERATING KAPACITOR CONFIG
+  shell: "docker run --rm kapacitor kapacitord config > {{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+  become: yes
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // LAUNCHING CONTAINER
+  docker_container:
+      name: dcf_kapacitor
+      image: kapacitor
+      state: started
+      command: "-config /etc/kapacitor/kapacitor.conf"
+      networks:
+          - name: "{{ docker.private_network.name }}"
+      purge_networks: yes
+      ports:
+          - "9092:9092"
+      volumes:
+          - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro"
+          - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/var_lib_kapacitor:/var/lib/kapacitor"
+          - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/exec:/tmp/exec"
+          - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/scripts:/home/kapacitor/scripts"
+      etc_hosts: "{{ lookup('template', 'etc_hosts.j2') }}"
+#      log_driver: syslog
+#      log_options:
+#          syslog-address: udp://localhost:514
+#          syslog-format: rfc5424
+#          tag: "{{ container_item }}"
+  become: yes
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+
+- name: CONTAINER WITH {{ container_item }} // WAITING CONTAINER TO BOOT
+  pause:
+      seconds: 15
+  tags:
+      - infra_enabler_install
+      - infra_enabler_ops
+
+- name: CONTAINER WITH {{ container_item }} // GENERATING SSL CERTIFICATE
+  shell: 'sudo docker exec -i dcf_kapacitor openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/influxdb-selfsigned.key -out /etc/ssl/influxdb-selfsigned.crt -days 365 -subj "/C=DE/ST=NRW/L=DUS/O=karneliuk.com/CN=kapacitor.karneliuk.com"'
+  become: yes
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // COLLECTING KAPACITOR DATA
+  docker_container:
+      name: dcf_kapacitor
+  become: yes
+  register: dcf_kapacitor_inspect
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // UPDATING HOSTNAME IN KAPACITOR.CONF
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+      regexp: '^hostname = .*$'
+      line: hostname = "{{ dcf_kapacitor_inspect.ansible_facts.docker_container.Config.Hostname }}"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // ENABLING HTTPS IN KAPACITOR.CONF
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+      regexp: 'https-enabled = false'
+      line: '  https-enabled = true'
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // PROVIDING CERTIFACTE PATH IN KAPACITOR.CONF
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+      regexp: 'https-certificate = "/etc/ssl/kapacitor.pem"'
+      line: '  https-certificate = "/etc/ssl/influxdb-selfsigned.crt"'
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // PROVIDING KEY PATH IN KAPACITOR.CONF
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+      regexp: 'https-private-key = ""'
+      line: '  https-private-key = "/etc/ssl/influxdb-selfsigned.key"'
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // UPDATING INFLUXDB ADDRESS IN KAPACITOR.CONF
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+      regexp: '^  urls = .*$'
+      line: urls = ["https://{{ dcf_influxdb_inspect.ansible_facts.docker_container.NetworkSettings.Networks.mon_net.IPAddress }}:8086"]
+      backrefs: yes
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // UPDATING INFLUXDB USERNAME IN KAPACITOR.CONF
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+      regexp: 'username = ""'
+      line: username = "{{ var_influxdb.username }}"
+  loop:
+      - 1
+      - 2
+      - 3
+      - 4
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // UPDATING INFLUXDB PASSWORD IN KAPACITOR.CONF
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+      regexp: 'password = ""'
+      line: password = "{{ var_influxdb.password }}"
+  loop:
+      - 1
+      - 2
+      - 3
+      - 4
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // SKIPPING TLS VERIFICATION IN KAPACITOR.CONF
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+      regexp: 'insecure-skip-verify = false'
+      line: '  insecure-skip-verify = true'
+  loop:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // UPDATING SUBSCRIPTION PROTOCOL IN KAPACITOR.CONF
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf"
+      regexp: 'subscription-protocol = "http"'
+      line: '  subscription-protocol = "https"'
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // RESTARTING CONTAINER
+  docker_container:
+      name: dcf_kapacitor
+      image: kapacitor
+      state: started
+      restart: yes
+      command: "-config /etc/kapacitor/kapacitor.conf"
+      networks:
+          - name: "{{ docker.private_network.name }}"
+      purge_networks: yes
+      ports:
+          - "9092:9092"
+      volumes:
+          - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro"
+          - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/var_lib_kapacitor:/var/lib/kapacitor"
+          - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/exec:/tmp/exec"
+          - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/scripts:/home/kapacitor/scripts"
+      etc_hosts: "{{ lookup('template', 'etc_hosts.j2') }}"
+#      log_driver: syslog
+#      log_options:
+#          syslog-address: udp://localhost:514
+#          syslog-format: rfc5424
+#          tag: "{{ container_item }}"
+  become: yes
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // INSTALLING SSH CLIENT
+  shell: 'sudo docker container exec -i dcf_kapacitor apt-get install -yqq ssh'
+  become: yes
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // COPYING TICK SCRIPTS
+  copy:
+      src: "{{ pwd_actual }}/files/infra_enabler/kapacitor/scripts/"
+      dest: "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/scripts"
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // TEMPLATING SHELL SCRIPTS
+  template:
+      src: launcher.j2
+      dest: "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/exec/launcher.sh"
+      mode: 0755
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // GENERATING SSH KEYS
+  shell: 'sudo docker container exec -i dcf_kapacitor ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""'
+  become: yes
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // COPYING SSH KEYS FROM CONTAINER TO MANAGEMENT HOST
+  shell: 'sudo docker container exec -i dcf_kapacitor cat /root/.ssh/id_rsa.pub >> /home/{{ ansible_user }}/.ssh/authorized_keys'
+  become: yes
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CHANGING SSH KEYS ACCESS PERMISSIONS
+  shell: 'chmod 600 /home/{{ ansible_user }}/.ssh/authorized_keys'
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // CREATING TASK FOR DHCP MONITORING
+  uri:
+      url: "https://localhost:9092/kapacitor/v1/tasks"
+      method: POST
+      body_format: json
+      src: "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/scripts/dhcp_ack_search.json"
+      validate_certs: no
+  ignore_errors: yes
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // ENABLING TASK FOR DHCP MONITORING
+  uri:
+      url: "https://localhost:9092/kapacitor/v1/tasks/dhcp_ack_search"
+      method: PATCH
+      body_format: json
+      body: >
+          {"status": "enabled"}
+      validate_certs: no
+  ignore_errors: yes
+  tags:
+      - infra_enabler_install
+...

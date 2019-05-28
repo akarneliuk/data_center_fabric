@@ -35,6 +35,6 @@ sudo ip6tables -I FORWARD 1 -p tcp --dport 8086 -j ACCEPT
 
 Creating and verifying tasks:
 1. To add the task to the lists: `sudo docker container exec -it dcf_kapacitor kapacitor -url https://localhost:9092 -skipVerify define dhcp_syslog_registration -tick /home/kapacitor/scripts/dhcp_syslog_registration.tick`.
-2. To check the content of the tasks in the list:`sudo docker container exec -it dcf_kapacitor kapacitor -url https://localhost:9092 -skipVerify list tasks`.
+2. To check the content of the tasks in the list:`curl -X GET https://localhost:9092/kapacitor/v1/tasks --insecure`.
 3. To enable task to be executed:`sudo docker container exec -it dcf_kapacitor kapacitor -url https://localhost:9092 -skipVerify enable dhcp_syslog_registration`.
 4. To show the details about the enabled task:`sudo docker container exec -it dcf_kapacitor kapacitor -url https://localhost:9092 -skipVerify show dhcp_syslog_registration`.

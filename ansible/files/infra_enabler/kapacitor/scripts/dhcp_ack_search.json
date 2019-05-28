@@ -1,0 +1,12 @@
+{
+    "id": "dhcp_ack_search",
+    "type": "stream",
+    "dbrps": [
+        {
+            "db": "dcf_syslog",
+            "rp": "autogen"
+        }
+    ],
+    "script": "stream\n    |from()\n        .database('dcf_syslog')\n    .retentionPolicy('autogen')\n        .measurement('syslog')\n        .where(lambda: \"msgid\" == 'dcf_dhcp')\n          .where(lambda: \"message\" =~ /^DHCPACK.*/)\n    |log()\n    |alert()\n        .crit(lambda: \"message\" =~ /^DHCPACK.*/)\n        .exec('/tmp/exec/launcher.sh')",
+    "vars": {}
+}

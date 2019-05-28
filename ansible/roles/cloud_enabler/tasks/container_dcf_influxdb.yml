@@ -118,6 +118,14 @@
   tags:
       - infra_enabler_install
 
+- name: CONTAINER WITH {{ container_item }} // ENABLING SSL FOR SUBSCRIPTION
+  lineinfile:
+      dest: "{{ docker.path_to_containers }}/influxdb/influxdb.conf"
+      regexp: 'insecure-skip-verify = false'
+      line: 'insecure-skip-verify = true'
+  tags:
+      - infra_enabler_install
+
 - name: CONTAINER WITH {{ container_item }} // RESTARTING CONTAINER
   docker_container:
       name: dcf_influxdb

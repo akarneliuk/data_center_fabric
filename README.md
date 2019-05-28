@@ -20,7 +20,7 @@ In the folder `containers` you can find source files of the infrastructure Docke
 
 ## Version
 
-The current version of this repository is `0.3.9`.
+The current version of this repository is `0.4.1`.
 
 ## Prerequisites
 
@@ -90,3 +90,11 @@ Version `0.3.8`.
 
 Version `0.3.9`.
 1. Problem with ntp in VRF for the `Cumulus` switches is fixed.
+
+Version `0.4.0`.
+1. The Docker container with Kapacitor to proces the data real-time is added, but configuration is still ongoing.
+
+Version `0.4.1`.
+1. The Docker container with Kapacitor is automatically deployed together with other `enabler` infrastructure.
+2. It connects to the `dcf_influxdb` on HTTPS and subscribe to `dcf_syslog` database to get all syslog messages.
+3. There is one TICK script currently which looks for DHCPACK from `dcf_influxdb` messages and triggers alert action (shell script) upon getting it.
