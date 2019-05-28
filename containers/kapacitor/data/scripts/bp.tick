@@ -1,0 +1,17 @@
+dbrp "dcf_syslog"."autogen"
+
+stream
+    |from()
+        .database('dcf_syslog')
+        .retentionPolicy('autogen')
+        .measurement('syslog')
+        .where(lambda: "msgid" == 'dcf_dhcp')
+        .where(lambda: "message" =~ /^DHCPACK.*/)
+    |log()
+    |eval(lambda: regexReplace(/^DHCPACK on \b([\d\.]+?)\b to.*/, "message", '$1'))
+        .as('ip_address')
+    |log()
+    |alert()
+        .crit(lambda: isPresent("ip_address"))
+        .log('/tmp/alert.log')
+        .exec('/tmp/exec/launcher.sh')
