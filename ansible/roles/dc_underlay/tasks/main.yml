@@ -70,6 +70,7 @@
   loop: "{{ get_devices.json.results }}"
   loop_control:
       loop_var: device_item
+  when: look_for_this_ip is undefined or (look_for_this_ip is defined and device_item.primary_ip4.address | ipaddr('address') == look_for_this_ip)
   tags:
       - configure_underlay
 ...

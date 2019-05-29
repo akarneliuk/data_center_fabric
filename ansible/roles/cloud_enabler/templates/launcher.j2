@@ -3,17 +3,23 @@
 # Extracting the management IPv4 of the node
 cat | sed 's/.*DHCPACK on \([[:digit:]\.]\+\?\) to.*/\1/' > /tmp/exec/ip.conf
 
-# Setting IP variable
+sleep 60
+
+# Setting variables
 IP=$(cat /tmp/exec/ip.conf)
+TIME_DATE=$(date)
+KAPACITOR_HOST=$(hostname)
 
 # Creating Ansible variable for a specific host
 echo "{\"look_for_this_ip\": \"$IP\"}" > /tmp/exec/specific_host.json
 
-# Creating the folder on the destination host or checking it's created
-ssh -o "StrictHostKeyChecking=no" {{ ansible_user }}@{{ mgmt_host_hostname.stdout }} "mkdir autotest"
-
-# Copying created var file to the management host
-scp -o "StrictHostKeyChecking=no" /tmp/exec/specific_host.json {{ ansible_user }}@{{ mgmt_host_hostname.stdout }}:autotest/specific_host.json
+# Logging the start of the provisioning
+ssh -o "StrictHostKeyChecking=no" {{ ansible_user }}@{{ mgmt_host_hostname.stdout }} "mkdir /home/aaa/github/data_center_fabric/ansible/logs; echo '$TIME_DATE: $KAPACITOR_HOST started the provisioning for $IP' >> /home/aaa/github/data_center_fabric/ansible/logs/auto_deployment_by_kapacitor.log "
 
 # Connecting to the host with Ansible and trigerring the action
-ssh -o "StrictHostKeyChecking=no" {{ ansible_user }}@{{ mgmt_host_hostname.stdout }} "echo 'This action will trigger the launch of the playbook for the provisioning of the full configuration for the $IP' > autotest/autotest_action"
+ssh -o "StrictHostKeyChecking=no" {{ ansible_user }}@{{ mgmt_host_hostname.stdout }} "cd /home/aaa/github/data_center_fabric/ansible ; ansible-playbook data_center_fabric.yml --inventory=inventory/hosts --tags=configure_underlay --extra-vars \"look_for_this_ip=$IP\""
+
+TIME_DATE=$(date)
+
+# Logging the finish of the provisioning
+ssh -o "StrictHostKeyChecking=no" {{ ansible_user }}@{{ mgmt_host_hostname.stdout }} "mkdir /home/aaa/github/data_center_fabric/ansible/logs; echo '$TIME_DATE: $KAPACITOR_HOST finished the provisioning for $IP' >> /home/aaa/github/data_center_fabric/ansible/logs/auto_deployment_by_kapacitor.log "

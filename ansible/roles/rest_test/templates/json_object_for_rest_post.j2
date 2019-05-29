@@ -1,0 +1,12 @@
+{
+    "id": "rest_test_template",
+    "type": "stream",
+    "dbrps": [
+        {
+            "db": "{{ var_influxdb.db_name.syslog }}",
+            "rp": "autogen"
+        }
+    ],
+    "script": "{{ tick_script }}",
+    "vars": {}
+}

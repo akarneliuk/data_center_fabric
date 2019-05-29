@@ -6,4 +6,5 @@
       - dc_underlay
       - cloud_docker
       - cloud_enabler
+      - rest_test
 ...

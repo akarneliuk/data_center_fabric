@@ -20,7 +20,7 @@ In the folder `containers` you can find source files of the infrastructure Docke
 
 ## Version
 
-The current version of this repository is `0.4.1`.
+The current version of this repository is `0.4.2`.
 
 ## Prerequisites
 
@@ -98,3 +98,7 @@ Version `0.4.1`.
 1. The Docker container with Kapacitor is automatically deployed together with other `enabler` infrastructure.
 2. It connects to the `dcf_influxdb` on HTTPS and subscribe to `dcf_syslog` database to get all syslog messages.
 3. There is one TICK script currently which looks for DHCPACK from `dcf_influxdb` messages and triggers alert action (shell script) upon getting it.
+
+Version `0.4.2`.
+1. Kapacitor triggers automatic full provisioning of the full `dc_underlay` role for a host with the specific management IP address.
+2. Kapacitor uses existing role `dc_underlay` with an additional ad-hoc variable.

@@ -1,0 +1,37 @@
+---
+- name: IMPORTING VARS
+  set_fact:
+      tick_script: "{{ lookup('template', 'dhcp_syslog_registration.j2') }}"
+  tags:
+      - rest_test
+
+- name: SHOWING VAR
+  debug:
+      msg: "{{ tick_script | string }}"
+  tags:
+      - rest_test
+
+- name: SHOWING REST POST
+  debug:
+      msg: "{{ lookup('template', 'json_object_for_rest_post.j2') }}"
+  tags:
+      - rest_test
+
+- name: TEMPLATING REST
+  template:
+      src: json_object_for_rest_post.j2
+      dest: test_rest_object.json
+  tags:
+      - rest_test
+
+- name: CONTAINER WITH {{ container_item }} // CREATING TASK FOR DHCP MONITORING
+  uri:
+      url: "https://localhost:9092/kapacitor/v1/tasks"
+      method: POST
+      body_format: json
+      src: test_rest_object.json
+      validate_certs: no
+  ignore_errors: yes
+  tags:
+      - rest_test
+...

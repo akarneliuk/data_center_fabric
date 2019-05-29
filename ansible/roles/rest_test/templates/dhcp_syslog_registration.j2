@@ -1,0 +1,11 @@
+stream
+    |from()
+        .database('{{ var_influxdb.db_name.syslog }}')
+        .retentionPolicy('autogen')
+        .measurement('syslog')
+        .where(lambda: "msgid" == 'dcf_dhcp')
+        .where(lambda: "message" =~ /^DHCPACK.*/)
+    |log()
+    |alert()
+        .crit(lambda: "message" =~ /^DHCPACK.*/)
+        .exec('/tmp/exec/launcher.sh')
