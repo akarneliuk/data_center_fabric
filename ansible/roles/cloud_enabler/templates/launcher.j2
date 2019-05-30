@@ -7,7 +7,7 @@ sleep 60
 
 # Setting variables
 IP=$(cat /tmp/exec/ip.conf)
-TIME_DATE=$(date)
+TIME_DATE=$(date --iso-8601=seconds)
 KAPACITOR_HOST=$(hostname)
 
 # Creating Ansible variable for a specific host
@@ -19,7 +19,7 @@ ssh -o "StrictHostKeyChecking=no" {{ ansible_user }}@{{ mgmt_host_hostname.stdou
 # Connecting to the host with Ansible and trigerring the action
 ssh -o "StrictHostKeyChecking=no" {{ ansible_user }}@{{ mgmt_host_hostname.stdout }} "cd /home/aaa/github/data_center_fabric/ansible ; ansible-playbook data_center_fabric.yml --inventory=inventory/hosts --tags=configure_underlay --extra-vars \"look_for_this_ip=$IP\""
 
-TIME_DATE=$(date)
+TIME_DATE=$(date --iso-8601=seconds)
 
 # Logging the finish of the provisioning
 ssh -o "StrictHostKeyChecking=no" {{ ansible_user }}@{{ mgmt_host_hostname.stdout }} "mkdir /home/aaa/github/data_center_fabric/ansible/logs; echo '$TIME_DATE: $KAPACITOR_HOST finished the provisioning for $IP' >> /home/aaa/github/data_center_fabric/ansible/logs/auto_deployment_by_kapacitor.log "

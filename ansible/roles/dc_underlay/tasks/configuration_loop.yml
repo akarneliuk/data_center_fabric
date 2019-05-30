@@ -1,4 +1,12 @@
 ---
+- name: CONFIGURATION LOOP // LOGGING THE PROVISIONING STARTED
+  lineinfile:
+      path: /home/aaa/github/data_center_fabric/ansible/logs/auto_deployment_by_kapacitor.log
+      insertafter: EOF
+      line: "{{ ansible_date_time.iso8601 }}: ansible-playbook started configuration of {{ device_item.name }} having mgmt IP {{ device_item.primary_ip4.address | ipaddr('address') }}"
+  tags:
+      - configure_underlay
+
 - name: CONFIGURATION LOOP // GETING PORTS CONFIG
   uri:
       url: "http://{{ netbox_host }}:{{ netbox_port }}/api/dcim/interfaces/?device={{ device_item.name }}"
@@ -85,6 +93,22 @@
   ignore_errors: yes
   ignore_unreachable: yes
   when: device_item.platform.slug == 'cisco-ios-xr'
+  tags:
+      - configure_underlay
+
+- name: CONFIGURATION LOOP // UPDATING DEVICE STATUS IN THE NETBOX
+  uri:
+      url: "http://{{ netbox_host }}:{{ netbox_port }}/api/dcim/devices/{{ device_item.id }}/"
+      method: PATCH
+      body_format: json
+      body: >
+          {"status": 1}
+      return_content: yes
+      headers:
+          accept: "application/json"
+          Content-Type: "application/json"
+          Authorization: "Token {{ netbox_token }}"
+  register: get_device_ports
   tags:
       - configure_underlay
 ...

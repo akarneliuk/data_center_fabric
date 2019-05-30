@@ -1,0 +1,16 @@
+---
+- name: STATUS CHECK // VERIFYING THE DEVICE IS PROVISIONED
+  lineinfile:
+      path: /home/aaa/github/data_center_fabric/ansible/logs/auto_deployment_by_kapacitor.log
+      insertafter: EOF
+      line: "{{ ansible_date_time.iso8601 }}: ansible-playbook detects that {{ device_item.name }} having mgmt IP {{ device_item.primary_ip4.address | ipaddr('address') }} is not in the 'Planned' state"
+  when: device_item.status.label != 'Planned'
+  tags:
+      - configure_underlay
+
+- name: STATUS CHECK // VERIFYING THE DEVICE ISN'T PROVISIONED
+  include_tasks: configuration_loop.yml
+  when: device_item.status.label == 'Planned'
+  tags:
+      - configure_underlay
+...

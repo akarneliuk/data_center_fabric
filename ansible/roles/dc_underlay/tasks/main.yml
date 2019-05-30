@@ -66,7 +66,7 @@
 #      - configure_underlay
 
 - name: STARTING CONFIGURATION LOOP
-  include_tasks: configuration_loop.yml
+  include_tasks: status_check.yml
   loop: "{{ get_devices.json.results }}"
   loop_control:
       loop_var: device_item

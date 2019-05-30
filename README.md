@@ -20,7 +20,7 @@ In the folder `containers` you can find source files of the infrastructure Docke
 
 ## Version
 
-The current version of this repository is `0.4.2`.
+The current version of this repository is `0.4.3`.
 
 ## Prerequisites
 
@@ -102,3 +102,6 @@ Version `0.4.1`.
 Version `0.4.2`.
 1. Kapacitor triggers automatic full provisioning of the full `dc_underlay` role for a host with the specific management IP address.
 2. Kapacitor uses existing role `dc_underlay` with an additional ad-hoc variable.
+
+Version `0.4.3`.
+1. The provisioning is done only for devices documented in NetBox with the status `Planned`. The device having any other status isn't provisioned. That's applicable both for manual execution and automatic one by Kapacitor.
