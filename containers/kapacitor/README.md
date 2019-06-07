@@ -19,6 +19,7 @@ sudo docker run -d -p 9092:9092 \
       -v $PWD/data/exec:/tmp/exec \
       -v $PWD/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro \
       --network mon_net \
+      --add-host "sand9.karneliuk.com:172.17.0.1" \
       --name dcf_kapacitor \
       kapacitor -config /etc/kapacitor/kapacitor.conf
 ```
@@ -26,6 +27,14 @@ sudo docker run -d -p 9092:9092 \
 To create self-signed SSL sertificate: 
 ```
 sudo docker exec -it dcf_kapacitor openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/influxdb-selfsigned.key -out /etc/ssl/influxdb-selfsigned.crt -days 365 -subj "/C=DE/ST=NRW/L=DUS/O=karneliuk.com/CN=kapacitor.karneliuk.com"
+```
+
+To establish the keyless SSH connection between the Kapacitor contaienr and the management host:
+```
+sudo docker container exec -it dcf_kapacitor apt-get install -yqq ssh
+sudo docker container exec -it dcf_kapacitor ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
+sudo docker container exec -it dcf_kapacitor cat /root/.ssh/id_rsa.pub >> /home/aaa/.ssh/authorized_keys
+chmod 600 /home/aaa/.ssh/authorized_keys
 ```
 
 And to allow communcation between Kapacitor and InfluxDB on IPv6:

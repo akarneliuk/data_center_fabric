@@ -20,7 +20,7 @@ In the folder `containers` you can find source files of the infrastructure Docke
 
 ## Version
 
-The current version of this repository is `0.4.3`.
+The current version of this repository is `0.5.0`.
 
 ## Prerequisites
 
@@ -105,3 +105,6 @@ Version `0.4.2`.
 
 Version `0.4.3`.
 1. The provisioning is done only for devices documented in NetBox with the status `Planned`. The device having any other status isn't provisioned. That's applicable both for manual execution and automatic one by Kapacitor.
+
+Version `0.5.0`.
+1. Some minor modification of the text in `README.md` files.

@@ -1,56 +1,14 @@
 ---
 - name: CONTAINER WITH {{ container_item }} // CREATING FOLDER 
   file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}"
+      dest: "{{ docker.path_to_containers }}/grafana"
       state: directory
   tags:
       - infra_enabler_install
 
 - name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOLDER
   file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data"
-      state: directory
-  tags:
-      - infra_enabler_install
-
-- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOR /VAR/LIB/GRAFANA
-  file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/var_lib_grafana"
-      state: directory
-  tags:
-      - infra_enabler_install
-
-- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOR /VAR/LIB/GRAFANA/DASHBOARDS
-  file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/var_lib_grafana/dashboards"
-      state: directory
-  tags:
-      - infra_enabler_install
-
-- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOR /ETC/GRAFANA
-  file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana"
-      state: directory
-  tags:
-      - infra_enabler_install
-
-- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOR /ETC/GRAFANA/PROVISIONING
-  file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana/provisioning"
-      state: directory
-  tags:
-      - infra_enabler_install
-
-- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOR /ETC/GRAFANA/PROVISIONING/DATASOURCES
-  file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana/provisioning/datasources"
-      state: directory
-  tags:
-      - infra_enabler_install
-
-- name: CONTAINER WITH {{ container_item }} // CREATING STORAGE FOR /ETC/GRAFANA/PROVISIONING/DASHBOARDS
-  file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana/provisioning/dashboards"
+      dest: "{{ docker.path_to_containers }}/grafana/data"
       state: directory
   tags:
       - infra_enabler_install
@@ -75,8 +33,7 @@
       ports:
            - "3000:3000"
       volumes:
-           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/var_lib_grafana:/var/lib/grafana"
-           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana/provisioning:/etc/grafana/provisioning"
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/grafana/data:/var/lib/grafana"
       log_driver: syslog
       log_options:
           syslog-address: udp://localhost:514
@@ -89,7 +46,7 @@
 
 - name: CONTAINER WITH {{ container_item }} // CREATE DATASTORE CONFIG FOR PROVISIONING
   file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana/provisioning/datasources/datastore.yml"
+      dest: "{{ docker.path_to_containers }}/grafana/datastore.yml"
       state: touch
   tags:
       - infra_enabler_install
@@ -121,14 +78,13 @@
                 isDefault: no
                 jsonData:
                     tlsSkipVerify: yes
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana/provisioning/datasources/datastore.yml"
+      dest: "{{ docker.path_to_containers }}/grafana/datastore.yml"
   tags:
       - infra_enabler_install
 
-- name: CONTAINER WITH {{ container_item }} // CREATE DASHBOARD CONFIG FOR PROVISIONING
-  file:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana/provisioning/dashboards/dashboard.yml"
-      state: touch
+- name: CONTAINER WITH {{ container_item }} // COPYING DATA SOURCE IN CONTAINER FOR PROVISIONING
+  shell: "docker cp {{ docker.path_to_containers }}/grafana/datastore.yml dcf_grafana:/etc/grafana/provisioning/datasources/datastore.yml"
+  become: yes
   tags:
       - infra_enabler_install
 
@@ -146,14 +102,13 @@
                 updateIntervalSeconds: 10
                 options:
                     path: /var/lib/grafana/dashboards
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana/provisioning/dashboards/dashboard.yml"
+      dest: "{{ docker.path_to_containers }}/grafana/dashboard.yml"
   tags:
       - infra_enabler_install
 
-- name: CONTAINER WITH {{ container_item }} // COPYING DASHBOARDS CONTENT
-  copy:
-      src: "{{ pwd_actual }}/files/infra_enabler/grafana/dashboards/"
-      dest: "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/var_lib_grafana/dashboards"
+- name: CONTAINER WITH {{ container_item }} // COPYING DASHBOARD DESCRIPTOR IN CONTAINER FOR PROVISIONING
+  shell: "docker cp {{ docker.path_to_containers }}/grafana/dashboard.yml dcf_grafana:/etc/grafana/provisioning/dashboards/dashboard.yml"
+  become: yes
   tags:
       - infra_enabler_install
 
@@ -164,14 +119,14 @@
       - infra_enabler_install
 
 - name: CONTAINER WITH {{ container_item }} // COPYING INITIAL CONFIGURATION FILE FROM GRAFANA
-  shell: "docker cp dcf_grafana:/etc/grafana/grafana.ini {{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
+  shell: "docker cp dcf_grafana:/etc/grafana/grafana.ini {{ docker.path_to_containers }}/grafana/grafana.ini"
   become: yes
   tags:
       - infra_enabler_install
 
 - name: CONTAINER WITH {{ container_item }} // ENABLING HTTPS
   lineinfile:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
+      dest: "{{ docker.path_to_containers }}/grafana/grafana.ini"
       regexp: ';protocol ='
       line: 'protocol = https'
   tags:
@@ -179,7 +134,7 @@
 
 - name: CONTAINER WITH {{ container_item }} // PROVIDING CERTIFICATE PATH
   lineinfile:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
+      dest: "{{ docker.path_to_containers }}/grafana/grafana.ini"
       regexp: '# https certs & key file'
       line: 'cert_file = /etc/ssl/grafana-selfsigned.crt'
   tags:
@@ -187,14 +142,14 @@
 
 - name: CONTAINER WITH {{ container_item }} // PROVIDING KEY PATH
   lineinfile:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
+      dest: "{{ docker.path_to_containers }}/grafana/grafana.ini"
       regexp: ';cert_key ='
       line: 'cert_key = /etc/ssl/grafana-selfsigned.key'
   tags:
       - infra_enabler_install
 
 - name: CONTAINER WITH {{ container_item }} // COPYING INITIAL CONFIGURATION FILE FROM GRAFANA
-  shell: "docker cp {{ docker.path_to_containers }}/{{ container_item }}/grafana.ini dcf_grafana:/etc/grafana/grafana.ini"
+  shell: "docker cp {{ docker.path_to_containers }}/grafana/grafana.ini dcf_grafana:/etc/grafana/grafana.ini"
   become: yes
   tags:
       - infra_enabler_install
@@ -212,8 +167,7 @@
       ports:
            - "3000:3000"
       volumes:
-           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/var_lib_grafana:/var/lib/grafana"
-           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/{{ container_item }}/data/etc_grafana/provisioning:/etc/grafana/provisioning"
+           - "{{ pwd_actual }}/{{ docker.path_to_containers }}/grafana/data:/var/lib/grafana"
       log_driver: syslog
       log_options:
           syslog-address: udp://localhost:514

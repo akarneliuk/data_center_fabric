@@ -1,59 +1,37 @@
-Wed May 29 18:45:20 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.21
-Wed May 29 18:45:54 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.21
-Wed May 29 18:46:55 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.22
-Wed May 29 18:47:27 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.22
-Wed May 29 18:48:27 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.23
-Wed May 29 18:49:00 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.23
-Wed May 29 18:50:00 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.25
-Wed May 29 18:50:31 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.25
-Wed May 29 18:51:32 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.26
-Wed May 29 18:52:04 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.26
-Wed May 29 18:53:05 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.24
-Wed May 29 18:53:40 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.24
-Wed May 29 18:54:40 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.21
-Wed May 29 18:55:14 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.21
-Wed May 29 18:56:14 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.22
-Wed May 29 18:56:47 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.22
-Wed May 29 18:57:47 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.25
-Wed May 29 18:58:12 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.25
-Wed May 29 18:59:12 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.24
-Wed May 29 18:59:40 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.24
-Wed May 29 19:00:41 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.26
-Wed May 29 19:01:09 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.26
-Wed May 29 19:02:09 UTC 2019: b51094d40a80 started the provisioning for 192.168.1.23
-Wed May 29 19:02:36 UTC 2019: b51094d40a80 finished the provisioning for 192.168.1.23
-2019-05-30T17:37:14Z: ansible-playbook detects that de-bln-infra-srv having mgmt IP 192.168.1.1 is not in the 'Planned' state
-2019-05-30T17:37:14Z: ansible-playbook started configuration of de-bln-leaf-111 having mgmt IP 192.168.1.21
-2019-05-30T17:37:14Z: ansible-playbook detects that de-bln-leaf-112 having mgmt IP 192.168.1.22 is not in the 'Planned' state
-2019-05-30T17:37:14Z: ansible-playbook detects that de-bln-leaf-211 having mgmt IP 192.168.1.23 is not in the 'Planned' state
-2019-05-30T17:37:14Z: ansible-playbook detects that de-bln-leaf-212 having mgmt IP 192.168.1.24 is not in the 'Planned' state
-2019-05-30T17:37:14Z: ansible-playbook detects that de-bln-spine-101 having mgmt IP 192.168.1.25 is not in the 'Planned' state
-2019-05-30T17:37:14Z: ansible-playbook detects that de-bln-spine-201 having mgmt IP 192.168.1.26 is not in the 'Planned' state
-2019-05-30T17:58:03Z: ansible-playbook detects that de-bln-infra-srv having mgmt IP 192.168.1.1 is not in the 'Planned' state
-2019-05-30T17:58:03Z: ansible-playbook started configuration of de-bln-leaf-111 having mgmt IP 192.168.1.21
-2019-05-30T17:59:25Z: ansible-playbook detects that de-bln-infra-srv having mgmt IP 192.168.1.1 is not in the 'Planned' state
-2019-05-30T17:59:25Z: ansible-playbook started configuration of de-bln-leaf-111 having mgmt IP 192.168.1.21
-2019-05-30T18:00:51Z: ansible-playbook detects that de-bln-infra-srv having mgmt IP 192.168.1.1 is not in the 'Planned' state
-2019-05-30T18:00:51Z: ansible-playbook started configuration of de-bln-leaf-111 having mgmt IP 192.168.1.21
-2019-05-30T18:01:21Z: ansible-playbook detects that de-bln-infra-srv having mgmt IP 192.168.1.1 is not in the 'Planned' state
-2019-05-30T18:01:21Z: ansible-playbook started configuration of de-bln-leaf-111 having mgmt IP 192.168.1.21
-2019-05-30T18:03:21Z: ansible-playbook detects that de-bln-infra-srv having mgmt IP 192.168.1.1 is not in the 'Planned' state
-2019-05-30T18:03:21Z: ansible-playbook started configuration of de-bln-leaf-111 having mgmt IP 192.168.1.21
-2019-05-30T18:03:21Z: ansible-playbook detects that de-bln-leaf-112 having mgmt IP 192.168.1.22 is not in the 'Planned' state
-2019-05-30T18:03:21Z: ansible-playbook detects that de-bln-leaf-211 having mgmt IP 192.168.1.23 is not in the 'Planned' state
-2019-05-30T18:03:21Z: ansible-playbook detects that de-bln-leaf-212 having mgmt IP 192.168.1.24 is not in the 'Planned' state
-2019-05-30T18:03:21Z: ansible-playbook detects that de-bln-spine-101 having mgmt IP 192.168.1.25 is not in the 'Planned' state
-2019-05-30T18:03:21Z: ansible-playbook detects that de-bln-spine-201 having mgmt IP 192.168.1.26 is not in the 'Planned' state
-2019-05-30T18:05:35Z: ansible-playbook detects that de-bln-infra-srv having mgmt IP 192.168.1.1 is not in the 'Planned' state
-2019-05-30T18:05:35Z: ansible-playbook detects that de-bln-leaf-112 having mgmt IP 192.168.1.22 is not in the 'Planned' state
-2019-05-30T18:05:35Z: ansible-playbook detects that de-bln-leaf-211 having mgmt IP 192.168.1.23 is not in the 'Planned' state
-2019-05-30T18:05:35Z: ansible-playbook detects that de-bln-leaf-212 having mgmt IP 192.168.1.24 is not in the 'Planned' state
-2019-05-30T18:05:35Z: ansible-playbook detects that de-bln-spine-101 having mgmt IP 192.168.1.25 is not in the 'Planned' state
-2019-05-30T18:05:35Z: ansible-playbook detects that de-bln-spine-201 having mgmt IP 192.168.1.26 is not in the 'Planned' state
-2019-05-30T18:06:37Z: ansible-playbook detects that de-bln-infra-srv having mgmt IP 192.168.1.1 is not in the 'Planned' state
-2019-05-30T18:06:37Z: ansible-playbook started configuration of de-bln-leaf-111 having mgmt IP 192.168.1.21
-2019-05-30T18:06:37Z: ansible-playbook detects that de-bln-leaf-112 having mgmt IP 192.168.1.22 is not in the 'Planned' state
-2019-05-30T18:06:37Z: ansible-playbook detects that de-bln-leaf-211 having mgmt IP 192.168.1.23 is not in the 'Planned' state
-2019-05-30T18:06:37Z: ansible-playbook detects that de-bln-leaf-212 having mgmt IP 192.168.1.24 is not in the 'Planned' state
-2019-05-30T18:06:37Z: ansible-playbook detects that de-bln-spine-101 having mgmt IP 192.168.1.25 is not in the 'Planned' state
-2019-05-30T18:06:37Z: ansible-playbook detects that de-bln-spine-201 having mgmt IP 192.168.1.26 is not in the 'Planned' state
+2019-06-07T19:42:23+00:00: 9b58e18a6d53 finished the provisioning for 192.168.1.26
+2019-06-07T19:58:10+00:00: 846320769d53 started the provisioning for 192.168.1.21
+2019-06-07T19:58:14Z: ansible-playbook started configuration of de-bln-leaf-111 having mgmt IP 192.168.1.21
+2019-06-07T19:58:44+00:00: 846320769d53 finished the provisioning for 192.168.1.21
+2019-06-07T19:59:45+00:00: 846320769d53 started the provisioning for 192.168.1.22
+2019-06-07T19:59:49Z: ansible-playbook started configuration of de-bln-leaf-112 having mgmt IP 192.168.1.22
+2019-06-07T20:00:20+00:00: 846320769d53 finished the provisioning for 192.168.1.22
+2019-06-07T20:01:20+00:00: 846320769d53 started the provisioning for 192.168.1.25
+2019-06-07T20:01:25Z: ansible-playbook started configuration of de-bln-spine-101 having mgmt IP 192.168.1.25
+2019-06-07T20:01:54+00:00: 846320769d53 finished the provisioning for 192.168.1.25
+2019-06-07T20:02:54+00:00: 846320769d53 started the provisioning for 192.168.1.24
+2019-06-07T20:02:58Z: ansible-playbook started configuration of de-bln-leaf-212 having mgmt IP 192.168.1.24
+2019-06-07T20:03:28+00:00: 846320769d53 finished the provisioning for 192.168.1.24
+2019-06-07T20:04:28+00:00: 846320769d53 started the provisioning for 192.168.1.23
+2019-06-07T20:04:33Z: ansible-playbook started configuration of de-bln-leaf-211 having mgmt IP 192.168.1.23
+2019-06-07T20:05:04+00:00: 846320769d53 finished the provisioning for 192.168.1.23
+2019-06-07T20:06:04+00:00: 846320769d53 started the provisioning for 192.168.1.26
+2019-06-07T20:06:09Z: ansible-playbook started configuration of de-bln-spine-201 having mgmt IP 192.168.1.26
+2019-06-07T20:06:37+00:00: 846320769d53 finished the provisioning for 192.168.1.26
+2019-06-07T20:07:38+00:00: 846320769d53 started the provisioning for 192.168.1.25
+2019-06-07T20:07:43Z: ansible-playbook detects that de-bln-spine-101 having mgmt IP 192.168.1.25 is not in the 'Planned' state
+2019-06-07T20:07:52+00:00: 846320769d53 finished the provisioning for 192.168.1.25
+2019-06-07T20:08:53+00:00: 846320769d53 started the provisioning for 192.168.1.24
+2019-06-07T20:08:58Z: ansible-playbook detects that de-bln-leaf-212 having mgmt IP 192.168.1.24 is not in the 'Planned' state
+2019-06-07T20:09:07+00:00: 846320769d53 finished the provisioning for 192.168.1.24
+2019-06-07T20:10:08+00:00: 846320769d53 started the provisioning for 192.168.1.23
+2019-06-07T20:10:12Z: ansible-playbook detects that de-bln-leaf-211 having mgmt IP 192.168.1.23 is not in the 'Planned' state
+2019-06-07T20:10:21+00:00: 846320769d53 finished the provisioning for 192.168.1.23
+2019-06-07T20:11:22+00:00: 846320769d53 started the provisioning for 192.168.1.22
+2019-06-07T20:11:26Z: ansible-playbook detects that de-bln-leaf-112 having mgmt IP 192.168.1.22 is not in the 'Planned' state
+2019-06-07T20:11:36+00:00: 846320769d53 finished the provisioning for 192.168.1.22
+2019-06-07T20:12:36+00:00: 846320769d53 started the provisioning for 192.168.1.21
+2019-06-07T20:12:41Z: ansible-playbook detects that de-bln-leaf-111 having mgmt IP 192.168.1.21 is not in the 'Planned' state
+2019-06-07T20:12:50+00:00: 846320769d53 finished the provisioning for 192.168.1.21
+2019-06-07T20:13:50+00:00: 846320769d53 started the provisioning for 192.168.1.26
+2019-06-07T20:13:55Z: ansible-playbook detects that de-bln-spine-201 having mgmt IP 192.168.1.26 is not in the 'Planned' state
+2019-06-07T20:14:04+00:00: 846320769d53 finished the provisioning for 192.168.1.26
