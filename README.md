@@ -108,3 +108,4 @@ Version `0.4.3`.
 
 Version `0.5.0`.
 1. Some minor modification of the text in `README.md` files.
+2. Provisioning of 3 described Grafana dashboards are done automatically during the deployment of the Grafana container.
