@@ -1,0 +1,59 @@
+dbrp "dcf_snmp"."autogen"
+
+var utilization1 = batch
+    |query('''
+         SELECT ifHCOutOctets
+         FROM dcf_snmp.autogen.interfaceX
+         WHERE (hostname = 'de-bln-leaf-111' AND ifName = 'swp3')
+     ''')
+        .align()
+        .period(15s)
+        .every(1m)
+        .offset(1m)
+    |last('ifHCOutOctets')
+        .as('ifHCOutOctets')
+    |log()
+        .prefix('AAAAAAAAAAAAAAAAAAAAAAA')
+
+var utilization2 = batch
+    |query('''
+         SELECT ifHCOutOctets
+         FROM dcf_snmp.autogen.interfaceX
+         WHERE (hostname = 'de-bln-leaf-111' AND ifName = 'swp3')
+     ''')
+        .align()
+        .period(15s)
+        .every(1m)
+        .offset(2m)
+    |last('ifHCOutOctets')
+        .as('ifHCOutOctets')
+    |log()
+        .prefix('BBBBBBBBBBBBBBBBBBBBBBB')
+
+var utilization3 = batch
+    |query('''
+         SELECT ifHCOutOctets
+         FROM dcf_snmp.autogen.interfaceX
+         WHERE (hostname = 'de-bln-leaf-111' AND ifName = 'swp3')
+     ''')
+        .align()
+        .period(15s)
+        .every(1m)
+        .offset(3m)
+    |last('ifHCOutOctets')
+        .as('ifHCOutOctets')
+    |log()
+        .prefix('CCCCCCCCCCCCCCCCCCCCCCC')
+
+var total_util = utilization1
+    |join(utilization2, utilization3)
+        .as('utilization1', 'utilization2', 'utilization3')
+        .tolerance(3m)
+    |eval(lambda: ("utilization1.ifHCOutOctets" - "utilization2.ifHCOutOctets") * 8.00 / 600.00)
+        .as('current_speed')
+    |log()
+        .prefix('DDDDDDDDDDDDDDDDDDDDDDD')
+    |eval(lambda: ("utilization2.ifHCOutOctets" - "utilization3.ifHCOutOctets") * 8.00 / 600.00)
+        .as('previous_speed')
+    |log()
+        .prefix('EEEEEEEEEEEEEEEEEEEEEEE')

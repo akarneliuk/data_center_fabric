@@ -1,0 +1,36 @@
+dbrp "dcf_snmp"."autogen"
+
+var utilization_last_minute = batch
+    |query('''
+         SELECT ifHCOutOctets
+         FROM dcf_snmp.autogen.interfaceX
+         WHERE (hostname = 'de-bln-leaf-111' AND ifName = 'swp3')
+     ''')
+        .align()
+        .period(10s)
+        .every(1m)
+        .offset(1m)
+
+utilization_last_minute
+    |eval(lambda: float("ifHCOutOctets") * 8.00 / 600.00)
+        .as('sent_bits')
+    |log()
+        .prefix('T1T1T1T1')
+
+var utilization_pre_last_minute = batch
+    |query('''
+         SELECT ifHCOutOctets
+         FROM dcf_snmp.autogen.interfaceX
+         WHERE (hostname = 'de-bln-leaf-111' AND ifName = 'swp3')
+     ''')
+        .align()
+        .period(10s)
+        .every(1m)
+        .offset(2m)
+
+utilization_pre_last_minute
+    |eval(lambda: float("ifHCOutOctets") * 8.00 / 600.00)
+        .as('sent_bits')
+    |log()
+        .prefix('T2T2T2T2')
+
