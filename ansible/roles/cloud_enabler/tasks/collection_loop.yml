@@ -1,6 +1,6 @@
 ---
 - name: COLLECTION LOOP // GETTING INFO ABOUT NETBOX CONTAINER
-  shell: "sudo docker container port {{ netbox_frontend_container }}"
+  shell: "docker container port {{ netbox_frontend_container }}"
   become: yes
   register: netbox_frontend_container_port
   tags:

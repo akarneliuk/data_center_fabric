@@ -4,7 +4,7 @@ working_folder: /tmp/network_fabric
 
 # Netbox integration
 netbox_host: localhost
-netbox_frontend_container: netboxdocker_nginx_1
+netbox_frontend_container: netbox-docker_nginx_1
 
 # Some fabric parameters:
 bgp:

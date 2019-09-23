@@ -90,7 +90,13 @@
       - infra_enabler_ops
 
 - name: CONTAINER WITH {{ container_item }} // GENERATING SSL CERTIFICATE
-  shell: 'sudo docker exec -i dcf_kapacitor openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/influxdb-selfsigned.key -out /etc/ssl/influxdb-selfsigned.crt -days 365 -subj "/C=DE/ST=NRW/L=DUS/O=karneliuk.com/CN=kapacitor.karneliuk.com"'
+  shell: 'docker exec -i dcf_kapacitor openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/influxdb-selfsigned.key -out /etc/ssl/influxdb-selfsigned.crt -days 365 -subj "/C=DE/ST=NRW/L=DUS/O=karneliuk.com/CN=kapacitor.karneliuk.com"'
+  become: yes
+  tags:
+      - infra_enabler_install
+
+- name: CONTAINER WITH {{ container_item }} // INSTALLING SSH CLIENT
+  shell: 'docker container exec -i dcf_kapacitor apt-get install -yqq ssh --fix-missing'
   become: yes
   tags:
       - infra_enabler_install
@@ -219,12 +225,6 @@
   tags:
       - infra_enabler_install
 
-- name: CONTAINER WITH {{ container_item }} // INSTALLING SSH CLIENT
-  shell: 'sudo docker container exec -i dcf_kapacitor apt-get install -yqq ssh'
-  become: yes
-  tags:
-      - infra_enabler_install
-
 - name: CONTAINER WITH {{ container_item }} // COPYING TICK SCRIPTS
   copy:
       src: "{{ pwd_actual }}/files/infra_enabler/kapacitor/scripts/"
@@ -241,24 +241,28 @@
       - infra_enabler_install
 
 - name: CONTAINER WITH {{ container_item }} // GENERATING SSH KEYS
-  shell: 'sudo docker container exec -i dcf_kapacitor ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""'
+  shell: 'docker container exec -i dcf_kapacitor ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""'
   become: yes
   tags:
       - infra_enabler_install
-      - infra_enabler_ops
 
 - name: CONTAINER WITH {{ container_item }} // COPYING SSH KEYS FROM CONTAINER TO MANAGEMENT HOST
-  shell: 'sudo docker container exec -i dcf_kapacitor cat /root/.ssh/id_rsa.pub >> /home/{{ ansible_user }}/.ssh/authorized_keys'
+  shell: 'docker container exec -i dcf_kapacitor cat /root/.ssh/id_rsa.pub >> /home/{{ ansible_user }}/.ssh/authorized_keys'
   become: yes
   tags:
       - infra_enabler_install
-      - infra_enabler_ops
 
 - name: CONTAINER WITH {{ container_item }} // CHANGING SSH KEYS ACCESS PERMISSIONS
   shell: 'chmod 600 /home/{{ ansible_user }}/.ssh/authorized_keys'
+  become: yes
   tags:
       - infra_enabler_install
-      - infra_enabler_ops
+
+- name: CONTAINER WITH {{ container_item }} // CHANGING SSH KEYS OWNER
+  shell: 'chown {{ ansible_user }}:{{ ansible_user }} /home/{{ ansible_user }}/.ssh/authorized_keys'
+  become: yes
+  tags:
+      - infra_enabler_install
 
 - name: CONTAINER WITH {{ container_item }} // CREATING TASK FOR DHCP MONITORING
   uri:

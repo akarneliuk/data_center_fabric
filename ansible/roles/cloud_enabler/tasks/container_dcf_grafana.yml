@@ -169,29 +169,29 @@
   tags:
       - infra_enabler_install
 
-- name: CONTAINER WITH {{ container_item }} // ENABLING HTTPS
-  lineinfile:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
-      regexp: ';protocol ='
-      line: 'protocol = https'
-  tags:
-      - infra_enabler_install
+#- name: CONTAINER WITH {{ container_item }} // ENABLING HTTPS
+#  lineinfile:
+#      dest: "{{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
+#      regexp: ';protocol ='
+#      line: 'protocol = https'
+#  tags:
+#      - infra_enabler_install
 
-- name: CONTAINER WITH {{ container_item }} // PROVIDING CERTIFICATE PATH
-  lineinfile:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
-      regexp: '# https certs & key file'
-      line: 'cert_file = /etc/ssl/grafana-selfsigned.crt'
-  tags:
-      - infra_enabler_install
+#- name: CONTAINER WITH {{ container_item }} // PROVIDING CERTIFICATE PATH
+#  lineinfile:
+#      dest: "{{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
+#      regexp: '# https certs & key file'
+#      line: 'cert_file = /etc/ssl/grafana-selfsigned.crt'
+#  tags:
+#      - infra_enabler_install
 
-- name: CONTAINER WITH {{ container_item }} // PROVIDING KEY PATH
-  lineinfile:
-      dest: "{{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
-      regexp: ';cert_key ='
-      line: 'cert_key = /etc/ssl/grafana-selfsigned.key'
-  tags:
-      - infra_enabler_install
+#- name: CONTAINER WITH {{ container_item }} // PROVIDING KEY PATH
+#  lineinfile:
+#      dest: "{{ docker.path_to_containers }}/{{ container_item }}/grafana.ini"
+#      regexp: ';cert_key ='
+#      line: 'cert_key = /etc/ssl/grafana-selfsigned.key'
+#  tags:
+#      - infra_enabler_install
 
 - name: CONTAINER WITH {{ container_item }} // COPYING INITIAL CONFIGURATION FILE FROM GRAFANA
   shell: "docker cp {{ docker.path_to_containers }}/{{ container_item }}/grafana.ini dcf_grafana:/etc/grafana/grafana.ini"
